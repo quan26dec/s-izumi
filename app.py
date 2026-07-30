@@ -82,7 +82,22 @@ if start_analysis:
     with st.spinner(
         "日経225オプションの需給を分析しています..."
     ):
+try:
+    option_df = fetch_options_by_date(
+        api_key=api_key,
+        target_date="20260730"
+    )
 
+    st.success(
+        f"J-Quants接続成功！ "
+        f"{len(option_df)}件取得しました。"
+    )
+
+except Exception as e:
+
+    st.error(f"J-Quants接続エラー：{e}")
+
+    st.stop()
         result = calculate_market_analysis(
             analysis_days=analysis_days
         )

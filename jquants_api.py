@@ -150,6 +150,8 @@ def fetch_options_by_date(
 
         response_data = response.json()
 
+        print("J-Quants response:", response_data)
+        
         records = response_data.get("data", [])
 
         if not records:

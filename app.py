@@ -6,7 +6,7 @@
 import streamlit as st
 
 from analysis import calculate_market_analysis
-
+from jquants_api import fetch_options_by_date
 
 # ============================================================
 # 1. ページ設定
@@ -24,6 +24,9 @@ st.set_page_config(
 # ============================================================
 
 st.title("📈 日経225需給分析 Ver.4")
+
+# J-Quants APIキー取得
+api_key = st.secrets["JQUANTS_API_KEY"]
 
 st.caption(
     "J-Quantsのオプションデータを使って、"

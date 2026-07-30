@@ -82,7 +82,7 @@ if start_analysis:
     with st.spinner(
         "日経225オプションの需給を分析しています..."
     ):
-try:
+    try:
     option_df = fetch_options_by_date(
         api_key=api_key,
         target_date="20260730"

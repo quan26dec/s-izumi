@@ -150,7 +150,7 @@ def fetch_options_by_date(
 
         response_data = response.json()
 
-        records = response_data.get("options", [])
+        records = response_data.get("data", [])
 
         if not records:
             break

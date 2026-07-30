@@ -73,7 +73,7 @@ def fetch_options_by_date(
 
     date_value = normalize_date(target_date)
 
-    url = f"{BASE_URL}/derivatives/options"
+    url = f"{BASE_URL}/derivatives/bars/daily/options/225"
 
     headers = {
         "x-api-key": api_key

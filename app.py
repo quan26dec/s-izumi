@@ -6,7 +6,7 @@
 import streamlit as st
 
 from analysis import calculate_market_analysis
-from jquants_api import fetch_options_by_date
+#from jquants_api import fetch_options_by_date
 
 # ============================================================
 # 1. ページ設定
@@ -26,7 +26,7 @@ st.set_page_config(
 st.title("📈 日経225需給分析 Ver.4")
 
 # J-Quants APIキー取得
-api_key = st.secrets["JQUANTS_API_KEY"]
+#api_key = st.secrets["JQUANTS_API_KEY"]
 
 st.caption(
     "J-Quantsのオプションデータを使って、"
@@ -76,37 +76,20 @@ start_analysis = st.button(
 # ============================================================
 # 5. 分析実行
 # ============================================================
-
 if start_analysis:
 
     with st.spinner(
         "日経225オプションの需給を分析しています..."
     ):
 
-        try:
-            option_df = fetch_options_by_date(
-                api_key=api_key,
-                target_date="20260730"
-            )
+        result = calculate_market_analysis(
+            analysis_days=analysis_days
+        )
 
-            st.success(
-                f"J-Quants接続成功！"
-                f"{len(option_df)}件取得しました。"
-            )
+        st.success(
+            "analysis.pyの分析処理を正常に実行しました！"
+        )
 
-            result = calculate_market_analysis(
-                analysis_days=analysis_days
-            )
-
-            st.success(
-                "analysis.pyの分析処理を正常に実行しました！"
-            )
-
-        except Exception as e:
-            st.error(
-                f"J-Quants接続エラー：{e}"
-            )
-            st.stop()
     # --------------------------------------------------------
     # 基本指標
     # --------------------------------------------------------

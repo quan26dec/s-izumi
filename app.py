@@ -1,6 +1,11 @@
+# ============================================================
+# 日経225需給分析 Ver.4
+# Streamlitアプリ本体
+# ============================================================
+
 import streamlit as st
-import pandas as pd
-from datetime import datetime
+
+from analysis import calculate_market_analysis
 
 
 # ============================================================
@@ -47,8 +52,8 @@ with st.sidebar:
     st.divider()
 
     st.info(
-        "J-Quantsの接続情報は、"
-        "GitHubではなくStreamlit Secretsに保存します。"
+        "現在は分析エンジンの移植確認中です。"
+        "次の段階でJ-Quantsへ接続します。"
     )
 
 
@@ -66,75 +71,126 @@ start_analysis = st.button(
 
 
 # ============================================================
-# 5. ボタンを押した後の処理
+# 5. 分析実行
 # ============================================================
 
 if start_analysis:
 
-    with st.spinner("日経225オプションを分析しています..."):
+    with st.spinner(
+        "日経225オプションの需給を分析しています..."
+    ):
 
-        # 現段階では動作確認用の仮データ
-        # 次のステップでJ-Quants APIへ置き換える
-        sample_data = pd.DataFrame({
-            "項目": [
-                "分析日時",
-                "分析営業日数",
-                "J-Quants接続",
-                "建玉分析",
-                "建玉重心",
-                "総合需給スコア"
-            ],
-            "結果": [
-                datetime.now().strftime(
-                    "%Y-%m-%d %H:%M:%S"
-                ),
-                f"{analysis_days}営業日",
-                "次のステップで接続",
-                "移植準備完了",
-                "移植準備完了",
-                "移植準備完了"
-            ]
-        })
+        result = calculate_market_analysis(
+            analysis_days=analysis_days
+        )
 
-    st.success("分析処理が正常に実行されました！")
-
-    st.subheader("📋 実行結果")
-
-    st.dataframe(
-        sample_data,
-        use_container_width=True,
-        hide_index=True
+    st.success(
+        "analysis.pyの分析処理を正常に実行しました！"
     )
+
+    # --------------------------------------------------------
+    # 基本指標
+    # --------------------------------------------------------
+
+    st.subheader("📊 最新の需給指標")
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
         st.metric(
             label="現在値",
-            value="移植準備中"
+            value=f"{result['current_price']:,.0f}円"
         )
 
     with col2:
         st.metric(
             label="Call重心",
-            value="移植準備中"
+            value=f"{result['call_center']:,.0f}円",
+            delta=(
+                f"現在値から "
+                f"{result['call_distance']:,.0f}円"
+            )
         )
 
     with col3:
         st.metric(
             label="Put重心",
-            value="移植準備中"
+            value=f"{result['put_center']:,.0f}円",
+            delta=(
+                f"現在値から "
+                f"{result['put_distance']:,.0f}円"
+            )
         )
 
-    st.info(
-        "次のステップで、ColabのJ-Quantsデータ取得処理を"
-        "このボタンへ接続します。"
+    # --------------------------------------------------------
+    # 総合判定
+    # --------------------------------------------------------
+
+    st.subheader("⭐ 総合需給判定")
+
+    judgment_col1, judgment_col2 = st.columns(2)
+
+    with judgment_col1:
+        st.metric(
+            label="総合需給スコア",
+            value=f"{result['total_score']:.1f}点"
+        )
+
+    with judgment_col2:
+        st.metric(
+            label="需給判定",
+            value=result["market_judgment"]
+        )
+
+    st.write(
+        f"評価：**{result['stars']}**"
     )
+
+    # --------------------------------------------------------
+    # 距離分析
+    # --------------------------------------------------------
+
+    st.subheader("📍 現在値と建玉重心の距離分析")
+
+    st.dataframe(
+        result["distance_df"],
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.info(
+        f"現在値はPut重心からCall重心方向へ"
+        f"{result['position_ratio']:.1f}%の位置です。"
+        f"現在は「{result['nearest_center']}」に近い状態です。"
+    )
+
+    # --------------------------------------------------------
+    # 実行情報
+    # --------------------------------------------------------
+
+    with st.expander("実行情報を見る"):
+
+        st.write(
+            "分析日時：",
+            result["analysis_datetime"].strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+        )
+
+        st.write(
+            "分析期間：",
+            f"{result['analysis_days']}営業日"
+        )
+
+        st.write(
+            "データ状態：",
+            "移植確認用の仮データ"
+        )
 
 else:
 
     st.info(
-        "上の「分析を開始する」ボタンを押してください。"
+        "「分析を開始する」ボタンを押してください。"
     )
 
 
@@ -145,6 +201,6 @@ else:
 st.divider()
 
 st.caption(
-    "※本アプリの分析結果は投資判断の参考情報であり、"
-    "将来の値動きを保証するものではありません。"
+    "※現在は移植確認用の仮データを使用しています。"
+    "分析結果は将来の値動きを保証するものではありません。"
 )

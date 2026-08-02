@@ -177,6 +177,78 @@ if st.button(
             width="stretch",
             hide_index=True,
         )
+
+        st.subheader("🔥 建玉集中ゾーン")
+
+        top_oi_df = option_df.copy()
+
+        for column in ["Strike", "OI", "PCDiv"]:
+            top_oi_df[column] = pd.to_numeric(
+                top_oi_df[column],
+                errors="coerce",
+            )
+
+        top_oi_df = top_oi_df.dropna(
+            subset=["CM", "Strike", "OI", "PCDiv"]
+        )
+
+        top_oi_df = top_oi_df[
+            (top_oi_df["CM"].astype(str) == nearest_cm)
+            & (top_oi_df["OI"] > 0)
+        ].copy()
+
+        top_oi_df = (
+            top_oi_df
+            .groupby(
+                ["PCDiv", "Strike"],
+                as_index=False,
+            )["OI"]
+            .sum()
+        )
+
+        top_call_df = (
+            top_oi_df[top_oi_df["PCDiv"] == 2]
+            .sort_values("OI", ascending=False)
+            .head(5)
+            [["Strike", "OI"]]
+            .rename(
+                columns={
+                    "Strike": "権利行使価格",
+                    "OI": "建玉",
+                }
+            )
+        )
+
+        top_put_df = (
+            top_oi_df[top_oi_df["PCDiv"] == 1]
+            .sort_values("OI", ascending=False)
+            .head(5)
+            [["Strike", "OI"]]
+            .rename(
+                columns={
+                    "Strike": "権利行使価格",
+                    "OI": "建玉",
+                }
+            )
+        )
+
+        call_zone_col, put_zone_col = st.columns(2)
+
+        with call_zone_col:
+            st.markdown("#### 📈 Call建玉 上位5")
+            st.dataframe(
+                top_call_df,
+                width="stretch",
+                hide_index=True,
+            )
+
+        with put_zone_col:
+            st.markdown("#### 📉 Put建玉 上位5")
+            st.dataframe(
+                top_put_df,
+                width="stretch",
+                hide_index=True,
+            )
         
         st.subheader("📋 取得データの先頭5行")
 

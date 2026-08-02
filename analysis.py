@@ -8,7 +8,10 @@ from datetime import datetime
 import pandas as pd
 
 
-def calculate_market_analysis(analysis_days: int) -> dict:
+def calculate_market_analysis(
+    option_df: pd.DataFrame,
+    analysis_days: int,
+) -> dict:
     """
     日経225需給分析を実行し、結果を辞書形式で返します。
 

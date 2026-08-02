@@ -192,9 +192,14 @@ if st.button(
             subset=["CM", "Strike", "OI", "PCDiv"]
         )
 
+        lower_price = result["current_price"] * 0.8
+        upper_price = result["current_price"] * 1.2
+
         top_oi_df = top_oi_df[
             (top_oi_df["CM"].astype(str) == nearest_cm)
             & (top_oi_df["OI"] > 0)
+            & (top_oi_df["Strike"] >= lower_price)
+            & (top_oi_df["Strike"] <= upper_price)
         ].copy()
 
         top_oi_df = (
@@ -206,11 +211,16 @@ if st.button(
             .sum()
         )
 
+        top_oi_df["現在値との差"] = (
+            top_oi_df["Strike"]
+            - result["current_price"]
+        ).abs()
+
         top_call_df = (
             top_oi_df[top_oi_df["PCDiv"] == 2]
             .sort_values("OI", ascending=False)
             .head(5)
-            [["Strike", "OI"]]
+            [["Strike", "OI", "現在値との差"]]
             .rename(
                 columns={
                     "Strike": "権利行使価格",
@@ -223,7 +233,7 @@ if st.button(
             top_oi_df[top_oi_df["PCDiv"] == 1]
             .sort_values("OI", ascending=False)
             .head(5)
-            [["Strike", "OI"]]
+            [["Strike", "OI", "現在値との差"]]
             .rename(
                 columns={
                     "Strike": "権利行使価格",

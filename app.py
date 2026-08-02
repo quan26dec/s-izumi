@@ -82,31 +82,31 @@ if st.button(
                 delta=f"現在値から {result['put_distance']:,.0f}円",
             )
 
-    st.subheader("⭐ 総合需給判定")
-
-judge_col1, judge_col2 = st.columns(2)
-
-with judge_col1:
-    st.metric(
-        label="総合需給スコア",
-        value=f"{result['total_score']:.1f}点",
+        st.subheader("⭐ 総合需給判定")
+    
+    judge_col1, judge_col2 = st.columns(2)
+    
+    with judge_col1:
+        st.metric(
+            label="総合需給スコア",
+            value=f"{result['total_score']:.1f}点",
+        )
+    
+    with judge_col2:
+        st.metric(
+            label="需給判定",
+            value=result["market_judgment"],
+        )
+    
+    st.write(
+        f"評価：{result['stars']}"
     )
-
-with judge_col2:
-    st.metric(
-        label="需給判定",
-        value=result["market_judgment"],
+    
+    st.info(
+        f"現在値は建玉レンジの "
+        f"{result['position_ratio']:.1f}% の位置です。"
+        f"最も近い重心は「{result['nearest_center']}」です。"
     )
-
-st.write(
-    f"評価：{result['stars']}"
-)
-
-st.info(
-    f"現在値は建玉レンジの "
-    f"{result['position_ratio']:.1f}% の位置です。"
-    f"最も近い重心は「{result['nearest_center']}」です。"
-)
         
         st.subheader("📋 取得データの先頭5行")
 

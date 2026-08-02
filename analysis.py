@@ -115,9 +115,42 @@ def calculate_market_analysis(
     else:
         nearest_center = "中立"
 
-    # 仮の総合需給スコア
-    total_score = 42.8
+    # --------------------------------------------------------
+    # 実データによる需給バランススコア
+    # 50点を中立として、0～100点に収める
+    # --------------------------------------------------------
 
+    total_score = 50.0
+
+    # 建玉レンジ内の位置を評価
+    # 50%より上ならプラス、下ならマイナス
+    position_score = (
+        position_ratio - 50.0
+    ) * 0.4
+
+    total_score += position_score
+
+    # Call重心とPut重心のどちらに近いかを評価
+    distance_total = call_distance + put_distance
+
+    if distance_total > 0:
+        center_bias = (
+            (put_distance - call_distance)
+            / distance_total
+            * 10
+        )
+        total_score += center_bias
+
+    # 0点～100点の範囲に制限
+    total_score = max(
+        0.0,
+        min(100.0, total_score),
+    )
+
+    # 小数第1位へ丸める
+    total_score = round(total_score, 1)
+
+    # スコアに応じて需給判定と星評価を決定
     if total_score >= 70:
         market_judgment = "強気"
         stars = "★★★★★"

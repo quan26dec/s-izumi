@@ -433,6 +433,56 @@ if st.button(
                 f"レンジ幅は約 {expected_range:,.0f}円です。"
             )
 
+            range_position = (
+                (current_price - nearest_support)
+                / expected_range
+                * 100
+            )
+
+            range_position = max(
+                0.0,
+                min(100.0, range_position),
+            )
+
+            if range_position >= 70:
+                range_judgment = "レジスタンス寄り"
+                range_message = (
+                    "現在値は注目レンジの上側にあります。"
+                    "直近レジスタンスへの接近に注意が必要です。"
+                )
+            elif range_position <= 30:
+                range_judgment = "サポート寄り"
+                range_message = (
+                    "現在値は注目レンジの下側にあります。"
+                    "直近サポートの反応が注目されます。"
+                )
+            else:
+                range_judgment = "レンジ中央"
+                range_message = (
+                    "現在値は注目レンジの中央付近にあります。"
+                    "上下どちらかへの離脱待ちの状態です。"
+                )
+
+            position_col1, position_col2 = st.columns(2)
+
+            with position_col1:
+                st.metric(
+                    label="レンジ内位置",
+                    value=f"{range_position:.1f}%",
+                )
+
+            with position_col2:
+                st.metric(
+                    label="現在位置の判定",
+                    value=range_judgment,
+                )
+
+            st.progress(
+                int(range_position)
+            )
+
+            st.info(range_message)
+
         st.subheader("📋 取得データの先頭5行")
 
         st.dataframe(

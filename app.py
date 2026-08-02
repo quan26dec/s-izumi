@@ -316,6 +316,40 @@ if st.button(
 
         st.info(market_comment)
         
+        st.subheader("🛡️ サポート・レジスタンス")
+
+		support_df = (
+		    top_put_df
+		    .sort_values("建玉", ascending=False)
+		    .head(3)
+		)
+
+		resistance_df = (
+		    top_call_df
+		    .sort_values("建玉", ascending=False)
+		    .head(3)
+		)
+
+		left_col, right_col = st.columns(2)
+
+		with left_col:
+		    st.success("### 🟢 サポート候補")
+
+		    for _, row in support_df.iterrows():
+		        st.write(
+		            f"**{row['権利行使価格']:,.0f}円** "
+		            f"(建玉 {row['建玉']:,.0f}枚)"
+		        )
+
+		with right_col:
+		    st.error("### 🔴 レジスタンス候補")
+
+		    for _, row in resistance_df.iterrows():
+		        st.write(
+		            f"**{row['権利行使価格']:,.0f}円** "
+		            f"(建玉 {row['建玉']:,.0f}枚)"
+		        )
+        
         st.subheader("📋 取得データの先頭5行")
 
         st.dataframe(

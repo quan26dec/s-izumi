@@ -350,6 +350,89 @@ if st.button(
                     f"(建玉 {row['建玉']:,.0f}枚)"
                 )
 
+        st.subheader("🎯 直近の重要価格帯")
+
+        current_price = result["current_price"]
+
+        support_candidates = top_put_df[
+            top_put_df["権利行使価格"] < current_price
+        ].copy()
+
+        resistance_candidates = top_call_df[
+            top_call_df["権利行使価格"] > current_price
+        ].copy()
+
+        if not support_candidates.empty:
+            nearest_support = (
+                support_candidates
+                .sort_values("権利行使価格", ascending=False)
+                .iloc[0]["権利行使価格"]
+            )
+            support_distance = current_price - nearest_support
+        else:
+            nearest_support = None
+            support_distance = None
+
+        if not resistance_candidates.empty:
+            nearest_resistance = (
+                resistance_candidates
+                .sort_values("権利行使価格", ascending=True)
+                .iloc[0]["権利行使価格"]
+            )
+            resistance_distance = nearest_resistance - current_price
+        else:
+            nearest_resistance = None
+            resistance_distance = None
+
+        price_col1, price_col2, price_col3 = st.columns(3)
+
+        with price_col1:
+            if nearest_support is not None:
+                st.metric(
+                    label="直近サポート",
+                    value=f"{nearest_support:,.0f}円",
+                    delta=f"現在値から下へ {support_distance:,.0f}円",
+                    delta_color="off",
+                )
+            else:
+                st.metric(
+                    label="直近サポート",
+                    value="該当なし",
+                )
+
+        with price_col2:
+            st.metric(
+                label="現在値",
+                value=f"{current_price:,.0f}円",
+            )
+
+        with price_col3:
+            if nearest_resistance is not None:
+                st.metric(
+                    label="直近レジスタンス",
+                    value=f"{nearest_resistance:,.0f}円",
+                    delta=f"現在値から上へ {resistance_distance:,.0f}円",
+                    delta_color="off",
+                )
+            else:
+                st.metric(
+                    label="直近レジスタンス",
+                    value="該当なし",
+                )
+
+        if (
+            nearest_support is not None
+            and nearest_resistance is not None
+        ):
+            expected_range = nearest_resistance - nearest_support
+
+            st.info(
+                f"現在の注目レンジは "
+                f"{nearest_support:,.0f}円〜"
+                f"{nearest_resistance:,.0f}円です。"
+                f"レンジ幅は約 {expected_range:,.0f}円です。"
+            )
+
         st.subheader("📋 取得データの先頭5行")
 
         st.dataframe(

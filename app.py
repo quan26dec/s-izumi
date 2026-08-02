@@ -260,6 +260,62 @@ if st.button(
                 hide_index=True,
             )
         
+        st.subheader("🤖 自動需給コメント")
+
+        if not top_call_df.empty:
+            strongest_call_strike = top_call_df.iloc[0]["権利行使価格"]
+            strongest_call_oi = top_call_df.iloc[0]["建玉"]
+        else:
+            strongest_call_strike = None
+            strongest_call_oi = 0
+
+        if not top_put_df.empty:
+            strongest_put_strike = top_put_df.iloc[0]["権利行使価格"]
+            strongest_put_oi = top_put_df.iloc[0]["建玉"]
+        else:
+            strongest_put_strike = None
+            strongest_put_oi = 0
+
+        comment_parts = []
+
+        comment_parts.append(
+            f"現在値は {result['current_price']:,.0f}円で、"
+            f"建玉レンジの {result['position_ratio']:.1f}% に位置しています。"
+        )
+
+        if strongest_call_strike is not None:
+            comment_parts.append(
+                f"Call建玉は {strongest_call_strike:,.0f}円に"
+                f"最も集中しており、建玉は {strongest_call_oi:,.0f}枚です。"
+                f"この水準は上値側で意識される可能性があります。"
+            )
+
+        if strongest_put_strike is not None:
+            comment_parts.append(
+                f"Put建玉は {strongest_put_strike:,.0f}円に"
+                f"最も集中しており、建玉は {strongest_put_oi:,.0f}枚です。"
+                f"この水準は下値側で意識される可能性があります。"
+            )
+
+        if result["nearest_center"] == "Call側":
+            comment_parts.append(
+                "現在値はPut重心よりCall重心に近く、"
+                "建玉レンジ内では上側に位置しています。"
+            )
+        elif result["nearest_center"] == "Put側":
+            comment_parts.append(
+                "現在値はCall重心よりPut重心に近く、"
+                "建玉レンジ内では下側に位置しています。"
+            )
+        else:
+            comment_parts.append(
+                "現在値はCall重心とPut重心のほぼ中間に位置しています。"
+            )
+
+        market_comment = " ".join(comment_parts)
+
+        st.info(market_comment)
+        
         st.subheader("📋 取得データの先頭5行")
 
         st.dataframe(

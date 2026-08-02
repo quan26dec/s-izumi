@@ -23,9 +23,69 @@ def calculate_market_analysis(
     # 仮の分析データ
     # --------------------------------------------------------
 
-    current_price = option_df["UnderPx"].dropna().iloc[0]
-    call_center = 72540
-    put_center = 53580
+    # 計算に使う列を数値へ変換
+work_df = option_df.copy()
+
+for column in ["Strike", "OI", "PCDiv", "UnderPx"]:
+    work_df[column] = pd.to_numeric(
+        work_df[column],
+        errors="coerce",
+    )
+
+# 必要な値がない行を除外
+work_df = work_df.dropna(
+    subset=["CM", "Strike", "OI", "PCDiv", "UnderPx"]
+)
+
+# 一番近い限月を取得
+current_cm = sorted(
+    work_df["CM"].astype(str).unique()
+)[0]
+
+# 直近限月だけに絞る
+current_df = work_df[
+    work_df["CM"].astype(str) == current_cm
+].copy()
+
+# 日経225の現在値
+current_price = (
+    current_df["UnderPx"]
+    .dropna()
+    .iloc[0]
+)
+
+# CallとPutに分ける
+call_df = current_df[
+    (current_df["PCDiv"] == 2)
+    & (current_df["OI"] > 0)
+].copy()
+
+put_df = current_df[
+    (current_df["PCDiv"] == 1)
+    & (current_df["OI"] > 0)
+].copy()
+
+# データが空なら停止
+if call_df.empty:
+    raise ValueError(
+        "直近限月のCallデータがありません。"
+    )
+
+if put_df.empty:
+    raise ValueError(
+        "直近限月のPutデータがありません。"
+    )
+
+# 建玉加重平均でCall・Put重心を計算
+call_center = (
+    (call_df["Strike"] * call_df["OI"]).sum()
+    / call_df["OI"].sum()
+)
+
+put_center = (
+    (put_df["Strike"] * put_df["OI"]).sum()
+    / put_df["OI"].sum()
+)
 
     call_distance = abs(
         call_center - current_price

@@ -23,7 +23,7 @@ def calculate_market_analysis(
     # 仮の分析データ
     # --------------------------------------------------------
 
-    current_price = 64120
+    current_price = option_df["UnderPx"].dropna().iloc[0]
     call_center = 72540
     put_center = 53580
 

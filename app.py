@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 import streamlit as st
 
+from analysis import calculate_market_analysis
 
 st.set_page_config(
     page_title="J-Quants接続テスト",
@@ -48,6 +49,11 @@ if st.button(
 
         option_df = pd.DataFrame(records)
 
+        result = calculate_market_analysis(
+            option_df=option_df,
+            analysis_days=5,
+        )
+        
         st.success(
             f"J-Quants接続成功！"
             f"{len(option_df):,}件取得しました。"

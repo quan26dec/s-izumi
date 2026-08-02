@@ -1,8 +1,11 @@
+from datetime import date, timedelta
+
 import pandas as pd
 import requests
 import streamlit as st
 
 from analysis import calculate_market_analysis
+
 
 st.set_page_config(
     page_title="J-Quants接続テスト",
@@ -23,10 +26,47 @@ headers = {
     "x-api-key": api_key
 }
 
-params = {
-    "date": "20260730"
-}
 
+def fetch_latest_option_data(
+    url: str,
+    headers: dict,
+    max_lookback_days: int = 10,
+):
+    """
+    今日から過去へさかのぼり、
+    データが存在する最新日のオプションデータを取得します。
+    """
+
+    for days_ago in range(max_lookback_days + 1):
+        target_date = date.today() - timedelta(days=days_ago)
+        date_text = target_date.strftime("%Y%m%d")
+
+        response = requests.get(
+            url,
+            headers=headers,
+            params={
+                "date": date_text,
+            },
+            timeout=30,
+        )
+
+        response.raise_for_status()
+
+        response_data = response.json()
+        records = response_data.get("data", [])
+
+        if records:
+            option_df = pd.DataFrame(records)
+
+            return (
+                option_df,
+                target_date,
+            )
+
+    raise ValueError(
+        f"直近{max_lookback_days}日以内に"
+        "オプションデータが見つかりませんでした。"
+    )
 
 if st.button(
     "J-Quantsへ接続する",
@@ -34,20 +74,11 @@ if st.button(
 ):
 
     try:
-        response = requests.get(
-            url,
+        option_df, data_date = fetch_latest_option_data(
+            url=url,
             headers=headers,
-            params=params,
-            timeout=30,
+            max_lookback_days=10,
         )
-
-        response.raise_for_status()
-
-        response_data = response.json()
-
-        records = response_data.get("data", [])
-
-        option_df = pd.DataFrame(records)
 
         result = calculate_market_analysis(
             option_df=option_df,
@@ -56,8 +87,10 @@ if st.button(
         
         st.success(
             f"J-Quants接続成功！"
+            f"{data_date:%Y年%m月%d日}のデータを"
             f"{len(option_df):,}件取得しました。"
         )
+        
         st.subheader("📊 実データ需給分析")
 
         col1, col2, col3 = st.columns(3)

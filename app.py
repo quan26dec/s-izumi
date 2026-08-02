@@ -108,11 +108,81 @@ if st.button(
             f"最も近い重心は「{result['nearest_center']}」です。"
         )
         
+        st.subheader("🎯 現在値に近い建玉ランキング")
+
+        ranking_df = option_df.copy()
+
+        for column in ["Strike", "OI", "PCDiv"]:
+            ranking_df[column] = pd.to_numeric(
+                ranking_df[column],
+                errors="coerce",
+            )
+
+        ranking_df = ranking_df.dropna(
+            subset=["CM", "Strike", "OI", "PCDiv"]
+        )
+
+        nearest_cm = sorted(
+            ranking_df["CM"].astype(str).unique()
+        )[0]
+
+        ranking_df = ranking_df[
+            (ranking_df["CM"].astype(str) == nearest_cm)
+            & (ranking_df["OI"] > 0)
+        ].copy()
+
+        ranking_df = (
+            ranking_df
+            .groupby(
+                ["PCDiv", "Strike"],
+                as_index=False,
+            )["OI"]
+            .sum()
+        )
+
+        ranking_df["区分"] = (
+            ranking_df["PCDiv"]
+            .map({
+                1: "Put",
+                2: "Call",
+            })
+            .fillna("不明")
+        )
+
+        ranking_df["現在値との差"] = (
+            ranking_df["Strike"]
+            - result["current_price"]
+        ).abs()
+
+        ranking_df = (
+            ranking_df
+            .sort_values(
+                ["現在値との差", "OI"],
+                ascending=[True, False],
+            )
+            .head(10)
+        )
+
+        ranking_df = ranking_df[
+            ["区分", "Strike", "OI", "現在値との差"]
+        ].rename(
+            columns={
+                "Strike": "権利行使価格",
+                "OI": "建玉",
+            }
+        )
+
+        st.dataframe(
+            ranking_df,
+            width="stretch",
+            hide_index=True,
+        )
+        
         st.subheader("📋 取得データの先頭5行")
 
         st.dataframe(
             option_df.head(),
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 

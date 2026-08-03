@@ -68,6 +68,49 @@ def fetch_latest_option_data(
         "オプションデータが見つかりませんでした。"
     )
 
+def fetch_previous_option_data(
+    url: str,
+    headers: dict,
+    latest_date: date,
+    max_lookback_days: int = 10,
+):
+    """
+    最新営業日の前日から過去へさかのぼり、
+    データが存在する直前営業日のオプションデータを取得します。
+    """
+
+    for days_ago in range(1, max_lookback_days + 1):
+        target_date = latest_date - timedelta(days=days_ago)
+        date_text = target_date.strftime("%Y%m%d")
+
+        response = requests.get(
+            url,
+            headers=headers,
+            params={
+                "date": date_text,
+            },
+            timeout=30,
+        )
+
+        response.raise_for_status()
+
+        response_data = response.json()
+        records = response_data.get("data", [])
+
+        if records:
+            previous_df = pd.DataFrame(records)
+
+            return (
+                previous_df,
+                target_date,
+            )
+
+    raise ValueError(
+        f"{latest_date:%Y年%m月%d日}より前の"
+        f"直近{max_lookback_days}日以内に"
+        "オプションデータが見つかりませんでした。"
+    )
+
 if st.button(
     "J-Quantsへ接続する",
     type="primary",
@@ -80,6 +123,13 @@ if st.button(
             max_lookback_days=10,
         )
 
+        previous_df, previous_date = fetch_previous_option_data(
+            url=url,
+            headers=headers,
+            latest_date=data_date,
+            max_lookback_days=10,
+        )
+
         result = calculate_market_analysis(
             option_df=option_df,
             analysis_days=5,
@@ -89,6 +139,12 @@ if st.button(
             f"J-Quants接続成功！"
             f"{data_date:%Y年%m月%d日}のデータを"
             f"{len(option_df):,}件取得しました。"
+        )
+        
+        st.info(
+            f"比較対象："
+            f"{previous_date:%Y年%m月%d日}のデータを"
+            f"{len(previous_df):,}件取得しました。"
         )
         
         st.subheader("📊 実データ需給分析")

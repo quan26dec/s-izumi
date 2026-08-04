@@ -574,41 +574,47 @@ if st.button(
 
         st.subheader("📈 建玉増減ランキング")
         
-                latest_oi_df = option_df.copy()
-        previous_oi_df = previous_df.copy()
+		st.subheader("📈 建玉増減ランキング")
 
-        for column in ["Strike", "OI", "PCDiv"]:
-            latest_oi_df[column] = pd.to_numeric(
-                latest_oi_df[column],
-                errors="coerce",
-            )
+		latest_oi_df = option_df.copy()
+		previous_oi_df = previous_df.copy()
 
-            previous_oi_df[column] = pd.to_numeric(
-                previous_oi_df[column],
-                errors="coerce",
-            )
-        
-                latest_oi_df = latest_oi_df.dropna(
-            subset=["CM", "Strike", "OI", "PCDiv"]
-        )
+		for column in ["Strike", "OI", "PCDiv"]:
+		    latest_oi_df[column] = pd.to_numeric(
+		        latest_oi_df[column],
+		        errors="coerce",
+		    )
 
-				latest_oi_df = (
-    				latest_oi_df
-    				.groupby(
-        				["PCDiv", "Strike"],
-        				as_index=False,
-    				)["OI"]
-    				.sum()
-				)
+		    previous_oi_df[column] = pd.to_numeric(
+		        previous_oi_df[column],
+		        errors="coerce",
+		    )
 
-previous_oi_df = (
-    previous_oi_df
-    .groupby(
-        ["PCDiv", "Strike"],
-        as_index=False,
-    )["OI"]
-    .sum()
-)
+		latest_oi_df = latest_oi_df.dropna(
+		    subset=["CM", "Strike", "OI", "PCDiv"]
+		)
+
+		previous_oi_df = previous_oi_df.dropna(
+		    subset=["CM", "Strike", "OI", "PCDiv"]
+		)
+
+		latest_oi_df = (
+		    latest_oi_df
+		    .groupby(
+		        ["PCDiv", "Strike"],
+		        as_index=False,
+		    )["OI"]
+		    .sum()
+		)
+
+		previous_oi_df = (
+		    previous_oi_df
+		    .groupby(
+		        ["PCDiv", "Strike"],
+		        as_index=False,
+		    )["OI"]
+		    .sum()
+		)
         
         st.subheader("📋 取得データの先頭5行")
 

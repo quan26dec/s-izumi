@@ -188,6 +188,222 @@ if st.button(
             .sum()
         )
 
+        oi_change_df = pd.merge(
+            latest_oi_df,
+            previous_oi_df,
+            on=["PCDiv", "Strike"],
+            how="outer",
+            suffixes=("_latest", "_previous"),
+        )
+
+        oi_change_df[
+            ["OI_latest", "OI_previous"]
+        ] = oi_change_df[
+            ["OI_latest", "OI_previous"]
+        ].fillna(0)
+
+        oi_change_df["OI_change"] = (
+            oi_change_df["OI_latest"]
+            - oi_change_df["OI_previous"]
+        )
+
+        oi_change_df["区分"] = (
+            oi_change_df["PCDiv"]
+            .map({
+                1: "Put",
+                2: "Call",
+            })
+            .fillna("不明")
+        )
+
+        call_ranking = (
+        oi_change_df[
+            (oi_change_df["区分"] == "Call")
+            & (oi_change_df["OI_change"] > 0)
+        ]
+        .sort_values("OI_change", ascending=False)
+        .head(10)
+    )
+
+        put_ranking = (
+            oi_change_df[
+                (oi_change_df["区分"] == "Put")
+                & (oi_change_df["OI_change"] > 0)
+            ]
+            .sort_values("OI_change", ascending=False)
+            .head(10)
+        )
+
+        col_call, col_put = st.columns(2)
+
+        with col_call:
+            st.write("### 📈 Call建玉増加 TOP10")
+            st.dataframe(call_ranking)
+
+        with col_put:
+            st.write("### 📉 Put建玉増加 TOP10")
+            st.dataframe(put_ranking)
+
+            ranking_col1, ranking_col2 = st.columns(2)
+
+        with ranking_col1:
+            st.markdown("#### 📈 Call建玉増加 TOP10")
+            st.dataframe(
+                call_ranking,
+                width="stretch",
+                hide_index=True,
+            )
+
+        with ranking_col2:
+            st.markdown("#### 📉 Put建玉増加 TOP10")
+            st.dataframe(
+                put_ranking,
+                width="stretch",
+                hide_index=True,
+            )
+
+            st.markdown("### 🔺 建玉増加ランキング")
+
+            ranking_col1, ranking_col2 = st.columns(2)
+
+        with ranking_col1:
+            st.markdown("#### 📈 Call建玉増加 TOP10")
+            st.dataframe(
+                call_ranking[
+                    [
+                        "Strike",
+                        "OI_previous",
+                        "OI_latest",
+                        "OI_change",
+                    ]
+                ].rename(
+                    columns={
+                        "Strike": "権利行使価格",
+                        "OI_previous": "前日建玉",
+                        "OI_latest": "当日建玉",
+                        "OI_change": "建玉増減",
+                    }
+                ),
+                width="stretch",
+                hide_index=True,
+            )
+
+        with ranking_col2:
+            st.markdown("#### 📉 Put建玉増加 TOP10")
+            st.dataframe(
+                put_ranking[
+                    [
+                        "Strike",
+                        "OI_previous",
+                        "OI_latest",
+                        "OI_change",
+                    ]
+                ].rename(
+                    columns={
+                        "Strike": "権利行使価格",
+                        "OI_previous": "前日建玉",
+                        "OI_latest": "当日建玉",
+                        "OI_change": "建玉増減",
+                    }
+                ),
+                width="stretch",
+                hide_index=True,
+            )    
+
+            ranking_col3, ranking_col4 = st.columns(2)
+
+        with ranking_col3:
+            st.markdown("#### 📉 Call建玉減少 TOP10")
+            st.dataframe(
+                call_decrease_ranking[
+                    [
+                        "Strike",
+                        "OI_previous",
+                        "OI_latest",
+                        "OI_change",
+                    ]
+                ].rename(
+                    columns={
+                        "Strike": "権利行使価格",
+                        "OI_previous": "前日建玉",
+                        "OI_latest": "当日建玉",
+                        "OI_change": "建玉増減",
+                    }
+                ),
+                width="stretch",
+                hide_index=True,
+            )
+
+        with ranking_col4:
+            st.markdown("#### 📈 Put建玉減少 TOP10")
+            st.dataframe(
+                put_decrease_ranking[
+                    [
+                        "Strike",
+                        "OI_previous",
+                        "OI_latest",
+                        "OI_change",
+                    ]
+                ].rename(
+                    columns={
+                        "Strike": "権利行使価格",
+                        "OI_previous": "前日建玉",
+                        "OI_latest": "当日建玉",
+                        "OI_change": "建玉増減",
+                    }
+                ),
+                width="stretch",
+                hide_index=True,
+            )
+
+            st.markdown("### 🔻 建玉減少ランキング")
+
+            ranking_col3, ranking_col4 = st.columns(2)
+
+        with ranking_col3:
+            st.markdown("#### 🔻 Call建玉減少 TOP10")
+            st.dataframe(
+                call_decrease_ranking[
+                    [
+                        "Strike",
+                        "OI_previous",
+                        "OI_latest",
+                        "OI_change",
+                    ]
+                ].rename(
+                    columns={
+                        "Strike": "権利行使価格",
+                        "OI_previous": "前日建玉",
+                        "OI_latest": "当日建玉",
+                        "OI_change": "建玉増減",
+                    }
+                ),
+                width="stretch",
+                hide_index=True,
+            )
+
+        with ranking_col4:
+            st.markdown("#### 🔻 Put建玉減少 TOP10")
+            st.dataframe(
+                put_decrease_ranking[
+                    [
+                        "Strike",
+                        "OI_previous",
+                        "OI_latest",
+                        "OI_change",
+                    ]
+                ].rename(
+                    columns={
+                        "Strike": "権利行使価格",
+                        "OI_previous": "前日建玉",
+                        "OI_latest": "当日建玉",
+                        "OI_change": "建玉増減",
+                    }
+                ),
+                width="stretch",
+                hide_index=True,
+            )
+
         st.subheader("📊 実データ需給分析")
 
         col1, col2, col3 = st.columns(3)

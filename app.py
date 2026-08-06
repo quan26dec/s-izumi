@@ -163,30 +163,30 @@ if st.button(
                 errors="coerce",
             )
 
-
-
         latest_oi_df = latest_oi_df.dropna(
-           subset=["CM", "Strike", "OI", "PCDiv"]
-        )
-
-            previous_oi_df = previous_oi_df.dropna(
             subset=["CM", "Strike", "OI", "PCDiv"]
         )
-            latest_oi_df = (
-                latest_oi_df
-                .groupby(
-                    ["PCDiv", "Strike"],
-                    as_index=False,
-                )["OI"]
-                .sum()
-            )
-            previous_oi_df = (
-                previous_oi_df
-                .groupby(
-                    ["PCDiv", "Strike"],
-                    as_index=False,
-                )["OI"]
-                .sum()
+
+        previous_oi_df = previous_oi_df.dropna(
+            subset=["CM", "Strike", "OI", "PCDiv"]
+        )
+
+        latest_oi_df = (
+            latest_oi_df
+            .groupby(
+                ["PCDiv", "Strike"],
+                as_index=False,
+            )["OI"]
+            .sum()
+        )
+
+        previous_oi_df = (
+            previous_oi_df
+            .groupby(
+                ["PCDiv", "Strike"],
+                as_index=False,
+            )["OI"]
+            .sum()
         )
 
         st.subheader("📊 実データ需給分析")

@@ -252,17 +252,7 @@ if st.button(
             .head(10)
         )
 
-        col_call, col_put = st.columns(2)
-
-        with col_call:
-            st.write("### 📈 Call建玉増加 TOP10")
-            st.dataframe(call_ranking)
-
-        with col_put:
-            st.write("### 📉 Put建玉増加 TOP10")
-            st.dataframe(put_ranking)
-
-            ranking_col1, ranking_col2 = st.columns(2)
+        ranking_col1, ranking_col2 = st.columns(2)
 
         with ranking_col1:
             st.markdown("#### 📈 Call建玉増加 TOP10")

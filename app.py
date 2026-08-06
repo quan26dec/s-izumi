@@ -5,7 +5,6 @@ import requests
 import streamlit as st
 
 from analysis import calculate_market_analysis
-from jquants_api import fetch_latest_option_data
 
 st.set_page_config(
     page_title="J-Quants接続テスト",

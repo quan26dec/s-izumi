@@ -234,6 +234,24 @@ if st.button(
             .head(10)
         )
 
+        call_decrease_ranking = (
+            oi_change_df[
+                (oi_change_df["区分"] == "Call")
+                & (oi_change_df["OI_change"] < 0)
+            ]
+            .sort_values("OI_change", ascending=True)
+            .head(10)
+        )
+
+        put_decrease_ranking = (
+            oi_change_df[
+                (oi_change_df["区分"] == "Put")
+                & (oi_change_df["OI_change"] < 0)
+            ]
+            .sort_values("OI_change", ascending=True)
+            .head(10)
+        )
+
         col_call, col_put = st.columns(2)
 
         with col_call:

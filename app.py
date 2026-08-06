@@ -147,6 +147,48 @@ if st.button(
             f"{len(previous_df):,}件取得しました。"
         )
         
+        st.subheader("📈 建玉増減ランキング")
+
+        latest_oi_df = option_df.copy()
+        previous_oi_df = previous_df.copy()
+
+        for column in ["Strike", "OI", "PCDiv"]:
+            latest_oi_df[column] = pd.to_numeric(
+                latest_oi_df[column],
+                errors="coerce",
+            )
+
+            previous_oi_df[column] = pd.to_numeric(
+                previous_oi_df[column],
+                errors="coerce",
+            )
+
+
+
+        latest_oi_df = latest_oi_df.dropna(
+           subset=["CM", "Strike", "OI", "PCDiv"]
+        )
+
+            previous_oi_df = previous_oi_df.dropna(
+            subset=["CM", "Strike", "OI", "PCDiv"]
+        )
+            latest_oi_df = (
+                latest_oi_df
+                .groupby(
+                    ["PCDiv", "Strike"],
+                    as_index=False,
+                )["OI"]
+                .sum()
+            )
+            previous_oi_df = (
+                previous_oi_df
+                .groupby(
+                    ["PCDiv", "Strike"],
+                    as_index=False,
+                )["OI"]
+                .sum()
+        )
+
         st.subheader("📊 実データ需給分析")
 
         col1, col2, col3 = st.columns(3)

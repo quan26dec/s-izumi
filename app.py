@@ -389,6 +389,86 @@ if st.button(
                     f"{top_put_down['OI_change']:,.0f}枚",
                 )
 
+        st.markdown("### 🎯 現在値周辺の建玉増加")
+
+        near_lower = result["current_price"] * 0.90
+        near_upper = result["current_price"] * 1.10
+
+        near_oi_change_df = oi_change_df[
+            (oi_change_df["Strike"] >= near_lower)
+            & (oi_change_df["Strike"] <= near_upper)
+            & (oi_change_df["OI_change"] > 0)
+        ].copy()
+
+        near_oi_change_df["現在値との差"] = (
+            near_oi_change_df["Strike"]
+            - result["current_price"]
+        ).abs()
+
+        near_call_increase = (
+            near_oi_change_df[
+                near_oi_change_df["区分"] == "Call"
+            ]
+            .sort_values("OI_change", ascending=False)
+            .head(5)
+        )
+
+        near_put_increase = (
+            near_oi_change_df[
+                near_oi_change_df["区分"] == "Put"
+            ]
+            .sort_values("OI_change", ascending=False)
+            .head(5)
+        )
+
+        near_col1, near_col2 = st.columns(2)
+
+        with near_col1:
+            st.markdown("#### 📈 Call 現在値周辺 TOP5")
+            st.dataframe(
+                near_call_increase[
+                    [
+                        "Strike",
+                        "OI_previous",
+                        "OI_latest",
+                        "OI_change",
+                        "現在値との差",
+                    ]
+                ].rename(
+                    columns={
+                        "Strike": "権利行使価格",
+                        "OI_previous": "前日建玉",
+                        "OI_latest": "当日建玉",
+                        "OI_change": "建玉増減",
+                    }
+                ),
+                width="stretch",
+                hide_index=True,
+            )
+
+        with near_col2:
+            st.markdown("#### 📉 Put 現在値周辺 TOP5")
+            st.dataframe(
+                near_put_increase[
+                    [
+                        "Strike",
+                        "OI_previous",
+                        "OI_latest",
+                        "OI_change",
+                        "現在値との差",
+                    ]
+                ].rename(
+                    columns={
+                        "Strike": "権利行使価格",
+                        "OI_previous": "前日建玉",
+                        "OI_latest": "当日建玉",
+                        "OI_change": "建玉増減",
+                    }
+                ),
+                width="stretch",
+                hide_index=True,
+            )
+
         st.subheader("📊 実データ需給分析")
 
         col1, col2, col3 = st.columns(3)

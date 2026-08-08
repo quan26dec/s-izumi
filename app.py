@@ -525,6 +525,93 @@ if st.button(
             "左ほどPut側、右ほどCall側の建玉増加が優勢です。"
         )
 
+        st.markdown("### 🎯 距離加重・建玉変化スコア")
+
+        distance_weight_df = near_oi_change_df.copy()
+
+        distance_weight_df["現在値との差"] = (
+            distance_weight_df["Strike"]
+            - result["current_price"]
+        ).abs()
+
+        distance_weight_df["距離ウェイト"] = (
+            1
+            / (
+                1
+                + distance_weight_df["現在値との差"]
+                / result["current_price"]
+                * 100
+            )
+        )
+
+        distance_weight_df["加重建玉増加"] = (
+            distance_weight_df["OI_change"]
+            * distance_weight_df["距離ウェイト"]
+        )
+
+        call_weighted_score = (
+            distance_weight_df[
+                distance_weight_df["区分"] == "Call"
+            ]["加重建玉増加"]
+            .sum()
+        )
+
+        put_weighted_score = (
+            distance_weight_df[
+                distance_weight_df["区分"] == "Put"
+            ]["加重建玉増加"]
+            .sum()
+        )
+
+        weighted_total = (
+            call_weighted_score
+            + put_weighted_score
+        )
+
+        if weighted_total > 0:
+            call_weighted_share = (
+                call_weighted_score
+                / weighted_total
+                * 100
+            )
+            put_weighted_share = 100 - call_weighted_share
+        else:
+            call_weighted_share = 50.0
+            put_weighted_share = 50.0
+
+        if call_weighted_share >= 60:
+            weighted_judgment = "Call側優勢"
+        elif put_weighted_share >= 60:
+            weighted_judgment = "Put側優勢"
+        else:
+            weighted_judgment = "拮抗"
+
+        weighted_col1, weighted_col2, weighted_col3 = st.columns(3)
+
+        with weighted_col1:
+            st.metric(
+                "Call距離加重比率",
+                f"{call_weighted_share:.1f}%",
+            )
+
+        with weighted_col2:
+            st.metric(
+                "Put距離加重比率",
+                f"{put_weighted_share:.1f}%",
+            )
+
+        with weighted_col3:
+            st.metric(
+                "距離加重判定",
+                weighted_judgment,
+            )
+
+        st.progress(int(call_weighted_share))
+
+        st.caption(
+            "現在値に近い権利行使価格ほど重く評価した建玉増加バランスです。"
+        )
+
         st.subheader("📊 実データ需給分析")
 
         col1, col2, col3 = st.columns(3)

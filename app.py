@@ -129,6 +129,13 @@ if st.button(
             max_lookback_days=10,
         )
 
+        two_days_ago_df, two_days_ago_date = fetch_previous_option_data(
+            url=url,
+            headers=headers,
+            latest_date=previous_date,
+            max_lookback_days=10,
+        )
+
         previous_oi_df_for_compare = previous_df.copy()
         two_days_ago_oi_df = two_days_ago_df.copy()
 

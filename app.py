@@ -789,6 +789,112 @@ if st.button(
                 f"（幅 {battle_range_width:,.0f}円）"
             )
 
+        st.markdown("### 📍 直近攻防価格")
+
+        near_lower_put = lower_put_df.copy()
+        near_upper_call = upper_call_df.copy()
+
+        near_lower_put["現在値との差"] = (
+            current_price
+            - near_lower_put["Strike"]
+        )
+
+        near_upper_call["現在値との差"] = (
+            near_upper_call["Strike"]
+            - current_price
+        )
+
+        near_lower_put = near_lower_put[
+            near_lower_put["現在値との差"] >= 0
+        ]
+
+        near_upper_call = near_upper_call[
+            near_upper_call["現在値との差"] >= 0
+        ]
+
+        if not near_lower_put.empty:
+            nearest_put_row = (
+                near_lower_put
+                .sort_values(
+                    ["現在値との差", "OI_change"],
+                    ascending=[True, False],
+                )
+                .iloc[0]
+            )
+            nearest_put_strike = nearest_put_row["Strike"]
+            nearest_put_change = nearest_put_row["OI_change"]
+            nearest_put_distance = nearest_put_row["現在値との差"]
+        else:
+            nearest_put_strike = None
+            nearest_put_change = 0
+            nearest_put_distance = None
+
+        if not near_upper_call.empty:
+            nearest_call_row = (
+                near_upper_call
+                .sort_values(
+                    ["現在値との差", "OI_change"],
+                    ascending=[True, False],
+                )
+                .iloc[0]
+            )
+            nearest_call_strike = nearest_call_row["Strike"]
+            nearest_call_change = nearest_call_row["OI_change"]
+            nearest_call_distance = nearest_call_row["現在値との差"]
+        else:
+            nearest_call_strike = None
+            nearest_call_change = 0
+            nearest_call_distance = None
+
+        near_battle_col1, near_battle_col2, near_battle_col3 = st.columns(3)
+
+        with near_battle_col1:
+            if nearest_put_strike is not None:
+                st.metric(
+                    "直近Put攻防",
+                    f"{nearest_put_strike:,.0f}円",
+                    f"現在値から下へ {nearest_put_distance:,.0f}円",
+                )
+            else:
+                st.metric(
+                    "直近Put攻防",
+                    "データなし",
+                )
+
+        with near_battle_col2:
+            st.metric(
+                "現在値",
+                f"{current_price:,.0f}円",
+            )
+
+        with near_battle_col3:
+            if nearest_call_strike is not None:
+                st.metric(
+                    "直近Call攻防",
+                    f"{nearest_call_strike:,.0f}円",
+                    f"現在値から上へ {nearest_call_distance:,.0f}円",
+                )
+            else:
+                st.metric(
+                    "直近Call攻防",
+                    "データなし",
+                )
+
+        if (
+            nearest_put_strike is not None
+            and nearest_call_strike is not None
+        ):
+            near_battle_width = (
+                nearest_call_strike
+                - nearest_put_strike
+            )
+
+            st.info(
+                f"直近攻防レンジ："
+                f"{nearest_put_strike:,.0f}円 ～ "
+                f"{nearest_call_strike:,.0f}円 "
+                f"（幅 {near_battle_width:,.0f}円）"
+            )
 
         st.subheader("📊 実データ需給分析")
 

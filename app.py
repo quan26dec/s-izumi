@@ -129,11 +129,62 @@ if st.button(
             max_lookback_days=10,
         )
 
+        previous_oi_df_for_compare = (
+            previous_oi_df_for_compare
+            .groupby(
+                ["PCDiv", "Strike"],
+                as_index=False,
+            )["OI"]
+            .sum()
+        )
+
+        two_days_ago_oi_df = (
+            two_days_ago_oi_df
+            .groupby(
+                ["PCDiv", "Strike"],
+                as_index=False,
+            )["OI"]
+            .sum()
+        )
+
+        previous_change_df = pd.merge(
+            previous_oi_df_for_compare,
+            two_days_ago_oi_df,
+            on=["PCDiv", "Strike"],
+            how="outer",
+            suffixes=("_previous", "_two_days_ago"),
+        )
+
+        previous_change_df[
+            ["OI_previous", "OI_two_days_ago"]
+        ] = previous_change_df[
+            ["OI_previous", "OI_two_days_ago"]
+        ].fillna(0)
+
+        previous_change_df["OI_change"] = (
+            previous_change_df["OI_previous"]
+            - previous_change_df["OI_two_days_ago"]
+        )
+
+        previous_change_df["区分"] = (
+            previous_change_df["PCDiv"]
+            .map({
+                1: "Put",
+                2: "Call",
+            })
+            .fillna("不明")
+        )
+
         result = calculate_market_analysis(
             option_df=option_df,
             analysis_days=5,
         )
-        
+
+        previous_result = calculate_market_analysis(
+            option_df=previous_df,
+            analysis_days=5,
+        )
+
         st.success(
             f"J-Quants接続成功！"
             f"{data_date:%Y年%m月%d日}のデータを"

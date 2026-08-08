@@ -349,6 +349,46 @@ if st.button(
                 hide_index=True,
             )
 
+        st.markdown("### 📌 建玉増減サマリー")
+
+        summary_col1, summary_col2, summary_col3, summary_col4 = st.columns(4)
+
+        if not call_ranking.empty:
+            with summary_col1:
+                top_call_up = call_ranking.iloc[0]
+                st.metric(
+                    "Call 最大増加",
+                    f"{top_call_up['Strike']:,.0f}円",
+                    f"+{top_call_up['OI_change']:,.0f}枚",
+                )
+
+        if not put_ranking.empty:
+            with summary_col2:
+                top_put_up = put_ranking.iloc[0]
+                st.metric(
+                    "Put 最大増加",
+                    f"{top_put_up['Strike']:,.0f}円",
+                    f"+{top_put_up['OI_change']:,.0f}枚",
+                )
+
+        if not call_decrease_ranking.empty:
+            with summary_col3:
+                top_call_down = call_decrease_ranking.iloc[0]
+                st.metric(
+                    "Call 最大減少",
+                    f"{top_call_down['Strike']:,.0f}円",
+                    f"{top_call_down['OI_change']:,.0f}枚",
+                )
+
+        if not put_decrease_ranking.empty:
+            with summary_col4:
+                top_put_down = put_decrease_ranking.iloc[0]
+                st.metric(
+                    "Put 最大減少",
+                    f"{top_put_down['Strike']:,.0f}円",
+                    f"{top_put_down['OI_change']:,.0f}枚",
+                )
+
         st.subheader("📊 実データ需給分析")
 
         col1, col2, col3 = st.columns(3)

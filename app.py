@@ -469,6 +469,62 @@ if st.button(
                 hide_index=True,
             )
 
+        st.markdown("### ⚖️ 現在値周辺の建玉変化バランス")
+
+        near_call_increase_sum = near_call_increase["OI_change"].sum()
+        near_put_increase_sum = near_put_increase["OI_change"].sum()
+
+        near_total_increase = (
+            near_call_increase_sum
+            + near_put_increase_sum
+        )
+
+        if near_total_increase > 0:
+            near_call_share = (
+                near_call_increase_sum
+                / near_total_increase
+                * 100
+            )
+            near_put_share = 100 - near_call_share
+        else:
+            near_call_share = 50.0
+            near_put_share = 50.0
+
+        if near_call_share >= 60:
+            near_balance_judgment = "Call側の建玉増加が優勢"
+        elif near_put_share >= 60:
+            near_balance_judgment = "Put側の建玉増加が優勢"
+        else:
+            near_balance_judgment = "Call・Putが拮抗"
+
+        balance_col1, balance_col2, balance_col3 = st.columns(3)
+
+        with balance_col1:
+            st.metric(
+                "Call建玉増加 合計",
+                f"{near_call_increase_sum:,.0f}枚",
+                f"{near_call_share:.1f}%",
+            )
+
+        with balance_col2:
+            st.metric(
+                "Put建玉増加 合計",
+                f"{near_put_increase_sum:,.0f}枚",
+                f"{near_put_share:.1f}%",
+            )
+
+        with balance_col3:
+            st.metric(
+                "建玉変化バランス",
+                near_balance_judgment,
+            )
+
+        st.progress(int(near_call_share))
+
+        st.caption(
+            "左ほどPut側、右ほどCall側の建玉増加が優勢です。"
+        )
+
         st.subheader("📊 実データ需給分析")
 
         col1, col2, col3 = st.columns(3)

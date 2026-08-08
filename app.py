@@ -789,7 +789,6 @@ if st.button(
                 f"（幅 {battle_range_width:,.0f}円）"
             )
 
-python -m py_compile app.py
 
         st.subheader("📊 実データ需給分析")
 

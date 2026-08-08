@@ -713,6 +713,82 @@ if st.button(
             f"（主要2象限比率 {main_pair_share:.1f}%）"
         )
 
+        st.markdown("### 🎯 主要攻防価格")
+
+        if not upper_call_df.empty:
+            top_upper_call = (
+                upper_call_df
+                .sort_values("OI_change", ascending=False)
+                .iloc[0]
+            )
+            upper_call_strike = top_upper_call["Strike"]
+            upper_call_change = top_upper_call["OI_change"]
+        else:
+            upper_call_strike = None
+            upper_call_change = 0
+
+        if not lower_put_df.empty:
+            top_lower_put = (
+                lower_put_df
+                .sort_values("OI_change", ascending=False)
+                .iloc[0]
+            )
+            lower_put_strike = top_lower_put["Strike"]
+            lower_put_change = top_lower_put["OI_change"]
+        else:
+            lower_put_strike = None
+            lower_put_change = 0
+
+        battle_col1, battle_col2, battle_col3 = st.columns(3)
+
+        with battle_col1:
+            if lower_put_strike is not None:
+                st.metric(
+                    "下側Put主要価格",
+                    f"{lower_put_strike:,.0f}円",
+                    f"+{lower_put_change:,.0f}枚",
+                )
+            else:
+                st.metric(
+                    "下側Put主要価格",
+                    "データなし",
+                )
+
+        with battle_col2:
+            st.metric(
+                "現在値",
+                f"{current_price:,.0f}円",
+            )
+
+        with battle_col3:
+            if upper_call_strike is not None:
+                st.metric(
+                    "上側Call主要価格",
+                    f"{upper_call_strike:,.0f}円",
+                    f"+{upper_call_change:,.0f}枚",
+                )
+            else:
+                st.metric(
+                    "上側Call主要価格",
+                    "データなし",
+                )
+
+        if (
+            lower_put_strike is not None
+            and upper_call_strike is not None
+        ):
+            battle_range_width = (
+                upper_call_strike
+                - lower_put_strike
+            )
+
+            st.info(
+                f"攻防レンジ候補："
+                f"{lower_put_strike:,.0f}円 ～ "
+                f"{upper_call_strike:,.0f}円 "
+                f"（幅 {battle_range_width:,.0f}円）"
+            )
+
         st.subheader("📊 実データ需給分析")
 
         col1, col2, col3 = st.columns(3)

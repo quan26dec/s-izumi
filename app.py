@@ -979,6 +979,74 @@ if st.button(
                     f"攻防強度：{strongest_upper_call_strength:,.1f}"
                 )
 
+        st.markdown("### ⚔️ 直近攻防判定")
+
+        battle_strength_total = (
+            strongest_lower_put_strength
+            + strongest_upper_call_strength
+        )
+
+        if battle_strength_total > 0:
+            put_strength_share = (
+                strongest_lower_put_strength
+                / battle_strength_total
+                * 100
+            )
+            call_strength_share = 100 - put_strength_share
+        else:
+            put_strength_share = 50.0
+            call_strength_share = 50.0
+
+        strength_difference = abs(
+            call_strength_share
+            - put_strength_share
+        )
+
+        if strength_difference <= 10:
+            battle_judgment = "ほぼ均衡"
+            battle_message = (
+                "直近のPut側とCall側の攻防強度は拮抗しています。"
+                "現在値は上下の攻防ラインに挟まれている状態です。"
+            )
+
+        elif call_strength_share > put_strength_share:
+            battle_judgment = "上値抵抗優勢"
+            battle_message = (
+                "直近ではCall側の攻防強度が優勢です。"
+                "上側の価格帯がより強く意識される可能性があります。"
+            )
+
+        else:
+            battle_judgment = "下値支持優勢"
+            battle_message = (
+                "直近ではPut側の攻防強度が優勢です。"
+                "下側の価格帯がより強く意識される可能性があります。"
+            )
+
+        battle_judge_col1, battle_judge_col2, battle_judge_col3 = st.columns(3)
+
+        with battle_judge_col1:
+            st.metric(
+                "Put側攻防比率",
+                f"{put_strength_share:.1f}%",
+            )
+
+        with battle_judge_col2:
+            st.metric(
+                "直近攻防判定",
+                battle_judgment,
+            )
+
+        with battle_judge_col3:
+            st.metric(
+                "Call側攻防比率",
+                f"{call_strength_share:.1f}%",
+            )
+
+        st.progress(int(call_strength_share))
+
+        st.info(battle_message)
+
         st.subheader("📊 実データ需給分析")
 
         col1, col2, col3 = st.columns(3)

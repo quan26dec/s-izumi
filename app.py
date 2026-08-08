@@ -896,6 +896,89 @@ if st.button(
                 f"（幅 {near_battle_width:,.0f}円）"
             )
 
+        st.markdown("### 💥 攻防強度スコア")
+
+        battle_strength_df = near_oi_change_df.copy()
+
+        battle_strength_df["現在値との差"] = (
+            battle_strength_df["Strike"]
+            - current_price
+        ).abs()
+
+        battle_strength_df["距離係数"] = (
+            1
+            / (
+                1
+                + battle_strength_df["現在値との差"]
+                / 250
+            )
+        )
+
+        battle_strength_df["攻防強度"] = (
+            battle_strength_df["OI_change"]
+            * battle_strength_df["距離係数"]
+        )
+
+        upper_call_strength_df = (
+            battle_strength_df[
+                (battle_strength_df["区分"] == "Call")
+                & (battle_strength_df["Strike"] > current_price)
+            ]
+            .sort_values("攻防強度", ascending=False)
+        )
+
+        lower_put_strength_df = (
+            battle_strength_df[
+                (battle_strength_df["区分"] == "Put")
+                & (battle_strength_df["Strike"] < current_price)
+            ]
+            .sort_values("攻防強度", ascending=False)
+        )
+
+        if not upper_call_strength_df.empty:
+            strongest_upper_call = upper_call_strength_df.iloc[0]
+            strongest_upper_call_strike = strongest_upper_call["Strike"]
+            strongest_upper_call_change = strongest_upper_call["OI_change"]
+            strongest_upper_call_strength = strongest_upper_call["攻防強度"]
+        else:
+            strongest_upper_call_strike = None
+            strongest_upper_call_change = 0
+            strongest_upper_call_strength = 0
+
+        if not lower_put_strength_df.empty:
+            strongest_lower_put = lower_put_strength_df.iloc[0]
+            strongest_lower_put_strike = strongest_lower_put["Strike"]
+            strongest_lower_put_change = strongest_lower_put["OI_change"]
+            strongest_lower_put_strength = strongest_lower_put["攻防強度"]
+        else:
+            strongest_lower_put_strike = None
+            strongest_lower_put_change = 0
+            strongest_lower_put_strength = 0
+
+        strength_col1, strength_col2 = st.columns(2)
+
+        with strength_col1:
+            if strongest_lower_put_strike is not None:
+                st.metric(
+                    "下側Put 最強攻防",
+                    f"{strongest_lower_put_strike:,.0f}円",
+                    f"+{strongest_lower_put_change:,.0f}枚",
+                )
+                st.caption(
+                    f"攻防強度：{strongest_lower_put_strength:,.1f}"
+                )
+
+        with strength_col2:
+            if strongest_upper_call_strike is not None:
+                st.metric(
+                    "上側Call 最強攻防",
+                    f"{strongest_upper_call_strike:,.0f}円",
+                    f"+{strongest_upper_call_change:,.0f}枚",
+                )
+                st.caption(
+                    f"攻防強度：{strongest_upper_call_strength:,.1f}"
+                )
+
         st.subheader("📊 実データ需給分析")
 
         col1, col2, col3 = st.columns(3)

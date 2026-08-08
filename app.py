@@ -129,6 +129,20 @@ if st.button(
             max_lookback_days=10,
         )
 
+        previous_oi_df_for_compare = previous_df.copy()
+        two_days_ago_oi_df = two_days_ago_df.copy()
+
+        for column in ["Strike", "OI", "PCDiv"]:
+            previous_oi_df_for_compare[column] = pd.to_numeric(
+                previous_oi_df_for_compare[column],
+                errors="coerce",
+            )
+
+            two_days_ago_oi_df[column] = pd.to_numeric(
+                two_days_ago_oi_df[column],
+                errors="coerce",
+            )
+
         previous_oi_df_for_compare = (
             previous_oi_df_for_compare
             .groupby(

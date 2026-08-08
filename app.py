@@ -612,6 +612,75 @@ if st.button(
             "現在値に近い権利行使価格ほど重く評価した建玉増加バランスです。"
         )
 
+        st.markdown("### 🧭 現在値を境にした建玉増加4象限")
+
+        current_price = result["current_price"]
+
+        upper_call_df = near_oi_change_df[
+            (near_oi_change_df["区分"] == "Call")
+            & (near_oi_change_df["Strike"] > current_price)
+        ].copy()
+
+        lower_call_df = near_oi_change_df[
+            (near_oi_change_df["区分"] == "Call")
+            & (near_oi_change_df["Strike"] < current_price)
+        ].copy()
+
+        upper_put_df = near_oi_change_df[
+            (near_oi_change_df["区分"] == "Put")
+            & (near_oi_change_df["Strike"] > current_price)
+        ].copy()
+
+        lower_put_df = near_oi_change_df[
+            (near_oi_change_df["区分"] == "Put")
+            & (near_oi_change_df["Strike"] < current_price)
+        ].copy()
+
+        upper_call_sum = upper_call_df["OI_change"].sum()
+        lower_call_sum = lower_call_df["OI_change"].sum()
+        upper_put_sum = upper_put_df["OI_change"].sum()
+        lower_put_sum = lower_put_df["OI_change"].sum()
+
+        quad_col1, quad_col2, quad_col3, quad_col4 = st.columns(4)
+
+        with quad_col1:
+            st.metric(
+                "上側 Call増加",
+                f"{upper_call_sum:,.0f}枚",
+            )
+
+        with quad_col2:
+            st.metric(
+                "下側 Put増加",
+                f"{lower_put_sum:,.0f}枚",
+            )
+
+        with quad_col3:
+            st.metric(
+                "下側 Call増加",
+                f"{lower_call_sum:,.0f}枚",
+            )
+
+        with quad_col4:
+            st.metric(
+                "上側 Put増加",
+                f"{upper_put_sum:,.0f}枚",
+            )
+
+        main_upper_pressure = upper_call_sum + upper_put_sum
+        main_lower_pressure = lower_call_sum + lower_put_sum
+
+        if main_upper_pressure > main_lower_pressure * 1.2:
+            quadrant_judgment = "上側の建玉形成が強い"
+        elif main_lower_pressure > main_upper_pressure * 1.2:
+            quadrant_judgment = "下側の建玉形成が強い"
+        else:
+            quadrant_judgment = "上下の建玉形成は拮抗"
+
+        st.info(
+            f"4象限判定：{quadrant_judgment}"
+        )
+
         st.subheader("📊 実データ需給分析")
 
         col1, col2, col3 = st.columns(3)

@@ -670,15 +670,47 @@ if st.button(
         main_upper_pressure = upper_call_sum + upper_put_sum
         main_lower_pressure = lower_call_sum + lower_put_sum
 
-        if main_upper_pressure > main_lower_pressure * 1.2:
-            quadrant_judgment = "上側の建玉形成が強い"
-        elif main_lower_pressure > main_upper_pressure * 1.2:
-            quadrant_judgment = "下側の建玉形成が強い"
+        main_pair = (
+            upper_call_sum
+            + lower_put_sum
+        )
+
+        reverse_pair = (
+            lower_call_sum
+            + upper_put_sum
+        )
+
+        quadrant_total = (
+            main_pair
+            + reverse_pair
+        )
+
+        if quadrant_total > 0:
+            main_pair_share = (
+                main_pair
+                / quadrant_total
+                * 100
+            )
         else:
-            quadrant_judgment = "上下の建玉形成は拮抗"
+            main_pair_share = 0.0
+
+        if main_pair_share >= 80:
+            if upper_call_sum > lower_put_sum * 1.5:
+                quadrant_judgment = "上側Call集中型"
+            elif lower_put_sum > upper_call_sum * 1.5:
+                quadrant_judgment = "下側Put集中型"
+            else:
+                quadrant_judgment = "レンジ形成型"
+
+        elif reverse_pair > main_pair:
+            quadrant_judgment = "逆配置型"
+
+        else:
+            quadrant_judgment = "方向感なし"
 
         st.info(
-            f"4象限判定：{quadrant_judgment}"
+            f"4象限判定：{quadrant_judgment} "
+            f"（主要2象限比率 {main_pair_share:.1f}%）"
         )
 
         st.subheader("📊 実データ需給分析")

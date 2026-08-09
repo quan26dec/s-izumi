@@ -271,26 +271,6 @@ if st.button(
             previous_call_weighted_share = 50.0
             previous_put_weighted_share = 50.0
 
-        call_share_change = (
-            call_weighted_share
-            - previous_call_weighted_share
-        )
-
-        put_share_change = (
-            put_weighted_share
-            - previous_put_weighted_share
-        )
-
-        if call_share_change >= 5:
-            flow_change_judgment = "Call側へ強くシフト"
-        elif call_share_change >= 2:
-            flow_change_judgment = "Call側へややシフト"
-        elif call_share_change <= -5:
-            flow_change_judgment = "Put側へ強くシフト"
-        elif call_share_change <= -2:
-            flow_change_judgment = "Put側へややシフト"
-        else:
-            flow_change_judgment = "ほぼ横ばい"
 
         st.success(
             f"J-Quants接続成功！"
@@ -743,6 +723,27 @@ if st.button(
             weighted_judgment = "Put側優勢"
         else:
             weighted_judgment = "拮抗"
+
+        call_share_change = (
+            call_weighted_share
+            - previous_call_weighted_share
+        )
+
+        put_share_change = (
+            put_weighted_share
+            - previous_put_weighted_share
+        )
+
+        if call_share_change >= 5:
+            flow_change_judgment = "Call側へ強くシフト"
+        elif call_share_change >= 2:
+            flow_change_judgment = "Call側へややシフト"
+        elif call_share_change <= -5:
+            flow_change_judgment = "Put側へ強くシフト"
+        elif call_share_change <= -2:
+            flow_change_judgment = "Put側へややシフト"
+        else:
+            flow_change_judgment = "ほぼ横ばい"
 
         weighted_col1, weighted_col2, weighted_col3 = st.columns(3)
 

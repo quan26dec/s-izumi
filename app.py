@@ -206,6 +206,92 @@ if st.button(
             analysis_days=5,
         )
 
+        previous_current_price = previous_result["current_price"]
+
+        previous_near_lower = previous_current_price * 0.90
+        previous_near_upper = previous_current_price * 1.10
+
+        previous_near_change_df = previous_change_df[
+            (previous_change_df["Strike"] >= previous_near_lower)
+            & (previous_change_df["Strike"] <= previous_near_upper)
+            & (previous_change_df["OI_change"] > 0)
+        ].copy()
+
+        previous_distance_weight_df = previous_near_change_df.copy()
+
+        previous_distance_weight_df["現在値との差"] = (
+            previous_distance_weight_df["Strike"]
+            - previous_current_price
+        ).abs()
+
+        previous_distance_weight_df["距離ウェイト"] = (
+            1
+            / (
+                1
+                + previous_distance_weight_df["現在値との差"]
+                / previous_current_price
+                * 100
+            )
+        )
+
+        previous_distance_weight_df["加重建玉増加"] = (
+            previous_distance_weight_df["OI_change"]
+            * previous_distance_weight_df["距離ウェイト"]
+        )
+
+        previous_call_weighted_score = (
+            previous_distance_weight_df[
+                previous_distance_weight_df["区分"] == "Call"
+            ]["加重建玉増加"]
+            .sum()
+        )
+
+        previous_put_weighted_score = (
+            previous_distance_weight_df[
+                previous_distance_weight_df["区分"] == "Put"
+            ]["加重建玉増加"]
+            .sum()
+        )
+
+        previous_weighted_total = (
+            previous_call_weighted_score
+            + previous_put_weighted_score
+        )
+
+        if previous_weighted_total > 0:
+            previous_call_weighted_share = (
+                previous_call_weighted_score
+                / previous_weighted_total
+                * 100
+            )
+            previous_put_weighted_share = (
+                100 - previous_call_weighted_share
+            )
+        else:
+            previous_call_weighted_share = 50.0
+            previous_put_weighted_share = 50.0
+
+        call_share_change = (
+            call_weighted_share
+            - previous_call_weighted_share
+        )
+
+        put_share_change = (
+            put_weighted_share
+            - previous_put_weighted_share
+        )
+
+        if call_share_change >= 5:
+            flow_change_judgment = "Call側へ強くシフト"
+        elif call_share_change >= 2:
+            flow_change_judgment = "Call側へややシフト"
+        elif call_share_change <= -5:
+            flow_change_judgment = "Put側へ強くシフト"
+        elif call_share_change <= -2:
+            flow_change_judgment = "Put側へややシフト"
+        else:
+            flow_change_judgment = "ほぼ横ばい"
+
         st.success(
             f"J-Quants接続成功！"
             f"{data_date:%Y年%m月%d日}のデータを"
@@ -676,6 +762,29 @@ if st.button(
             st.metric(
                 "距離加重判定",
                 weighted_judgment,
+            )
+
+        st.markdown("#### 🔄 前日からの需給変化")
+
+        flow_col1, flow_col2, flow_col3 = st.columns(3)
+
+        with flow_col1:
+            st.metric(
+                "前日 Call比率",
+                f"{previous_call_weighted_share:.1f}%",
+            )
+
+        with flow_col2:
+            st.metric(
+                "現在 Call比率",
+                f"{call_weighted_share:.1f}%",
+                delta=f"{call_share_change:+.1f}pt",
+            )
+
+        with flow_col3:
+            st.metric(
+                "需給変化判定",
+                flow_change_judgment,
             )
 
         st.progress(int(call_weighted_share))

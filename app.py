@@ -387,6 +387,16 @@ if st.button(
             .head(10)
         )
 
+        if not call_ranking.empty and not put_ranking.empty:
+            top_call = call_ranking.iloc[0]
+            top_put = put_ranking.iloc[0]
+
+            st.info(
+                f"📌 本日の建玉変化："
+                f"Put {top_put['Strike']:,.0f}円に +{top_put['OI_change']:,.0f}枚 "
+                f"｜ Call {top_call['Strike']:,.0f}円に +{top_call['OI_change']:,.0f}枚"
+            )
+
         st.markdown("### 🔺 建玉増加ランキング")
 
         ranking_col1, ranking_col2 = st.columns(2)

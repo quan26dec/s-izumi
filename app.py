@@ -12,7 +12,7 @@ st.set_page_config(
     layout="wide",
 )
 
-st.title("🧪 J-Quants 接続テスト")
+st.title("📊 日経225 オプション需給分析")
 
 summary_placeholder = st.empty()
 

@@ -274,16 +274,11 @@ if st.button(
             previous_put_weighted_share = 50.0
 
 
-        st.success(
-            f"J-Quants接続成功！"
-            f"{data_date:%Y年%m月%d日}のデータを"
-            f"{len(option_df):,}件取得しました。"
-        )
-        
-        st.info(
-            f"比較対象："
-            f"{previous_date:%Y年%m月%d日}のデータを"
-            f"{len(previous_df):,}件取得しました。"
+        st.caption(
+            f"✅ 最新：{data_date:%Y年%m月%d日} "
+            f"（{len(option_df):,}件）"
+            f"　｜　比較：{previous_date:%Y年%m月%d日} "
+            f"（{len(previous_df):,}件）"
         )
         
         st.subheader("📈 建玉増減ランキング")

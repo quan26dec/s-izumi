@@ -14,6 +14,8 @@ st.set_page_config(
 
 st.title("🧪 J-Quants 接続テスト")
 
+summary_placeholder = st.empty()
+
 api_key = st.secrets["JQUANTS_API_KEY"]
 
 url = (
@@ -1283,7 +1285,13 @@ if st.button(
             f"{result['position_ratio']:.1f}% の位置です。"
             f"最も近い重心は「{result['nearest_center']}」です。"
         )
-        
+
+        summary_placeholder.info(
+            f"⭐ 総合需給判定：{result['market_judgment']} "
+            f"｜ スコア：{result['total_score']:.1f}点 "
+            f"｜ 評価：{result['stars']}"
+        )
+
         st.subheader("🎯 現在値に近い建玉ランキング")
 
         ranking_df = option_df.copy()

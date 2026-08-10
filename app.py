@@ -788,6 +788,11 @@ if st.button(
                 flow_change_judgment,
             )
 
+        st.info(
+            f"現在の建玉バランスは「{weighted_judgment}」。"
+            f"前日比では「{flow_change_judgment}」です。"
+        )
+
         st.progress(int(call_weighted_share))
 
         st.caption(

@@ -1679,17 +1679,18 @@ if st.button(
 
             st.info(range_message)
 
-        st.subheader("📋 取得データの先頭5行")
+        with st.expander("🔧 開発者向けデータ"):
+            st.markdown("#### 📋 取得データの先頭5行")
 
-        st.dataframe(
-            option_df.head(),
-            width="stretch",
-            hide_index=True,
-        )
+            st.dataframe(
+                option_df.head(),
+                width="stretch",
+                hide_index=True,
+            )
 
-        st.subheader("🔎 列名一覧")
+            st.markdown("#### 🔎 列名一覧")
 
-        st.write(option_df.columns.tolist())
+            st.write(option_df.columns.tolist())
     except requests.exceptions.RequestException as e:
         st.error(
             f"J-Quantsへの接続に失敗しました：{e}"

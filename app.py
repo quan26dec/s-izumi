@@ -1289,7 +1289,9 @@ if st.button(
         summary_placeholder.info(
             f"⭐ 総合需給判定：{result['market_judgment']} "
             f"｜ スコア：{result['total_score']:.1f}点 "
-            f"｜ 評価：{result['stars']}"
+            f"｜ 評価：{result['stars']} "
+            f"｜ 🔄 前日比：{flow_change_judgment} "
+            f"（Call {call_share_change:+.1f}pt）"
         )
 
         st.subheader("🎯 現在値に近い建玉ランキング")

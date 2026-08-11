@@ -632,7 +632,7 @@ if st.button(
                 hide_index=True,
             )
 
-        st.markdown("### ⚖️ 現在値周辺の建玉変化バランス")
+        st.markdown("### ⚖️ 現在値周辺の建玉変化バランス（単純集計）")  
 
         near_call_increase_sum = near_call_increase["OI_change"].sum()
         near_put_increase_sum = near_put_increase["OI_change"].sum()
@@ -770,6 +770,14 @@ if st.button(
         else:
             flow_change_judgment = "ほぼ横ばい"
 
+        st.info(
+            f"🎯 距離加重判定：{weighted_judgment} ｜ "
+            f"Call {call_weighted_share:.1f}% / "
+            f"Put {put_weighted_share:.1f}% ｜ "
+            f"前日比：{flow_change_judgment} "
+            f"(Call {call_share_change:+.1f}pt)"
+        )
+
         weighted_col1, weighted_col2, weighted_col3 = st.columns(3)
 
         with weighted_col1:
@@ -789,6 +797,35 @@ if st.button(
                 "距離加重判定",
                 weighted_judgment,
             )
+
+        st.info(
+            f"🔎 集計比較："
+            f"単純集計では「{near_balance_judgment}」 ｜ "
+            f"距離加重では「{weighted_judgment}」"
+        )
+
+        if (
+            "Call" in near_balance_judgment
+            and "Call" in weighted_judgment
+        ):
+            comparison_judgment = "🟢 Call優勢で一致"
+
+        elif (
+            "Put" in near_balance_judgment
+            and "Put" in weighted_judgment
+        ):
+            comparison_judgment = "🔴 Put優勢で一致"
+
+        elif (
+            "拮抗" in near_balance_judgment
+            or "拮抗" in weighted_judgment
+        ):
+            comparison_judgment = "🟡 方向感はまだ不明瞭"
+
+        else:
+            comparison_judgment = "⚠️ 単純集計と距離加重が逆行"
+
+        st.caption(f"需給シグナル整合性：{comparison_judgment}")
 
         st.markdown("#### 🔄 前日からの需給変化")
 

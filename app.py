@@ -905,6 +905,29 @@ if st.button(
 
         st.info(f"🧭 状態×変化判定：{state_change_interpretation}")
 
+        flow_score_adjustment = max(
+            -10.0,
+            min(
+                10.0,
+                call_share_change * 0.5,
+            ),
+        )
+
+        adjusted_total_score = max(
+            0.0,
+            min(
+                100.0,
+                result["total_score"] + flow_score_adjustment,
+            ),
+        )
+
+        st.info(
+            f"📊 スコア変化："
+            f"状態 {result['total_score']:.1f}点 "
+            f"→ 変化補正 {flow_score_adjustment:+.1f}点 "
+            f"→ 短期補正後 {adjusted_total_score:.1f}点"
+        )
+
         st.warning(
             f"総合変化シグナル：{total_flow_signal}"
         )

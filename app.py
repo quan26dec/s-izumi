@@ -921,11 +921,23 @@ if st.button(
             ),
         )
 
+        if adjusted_total_score >= 70:
+            adjusted_market_judgment = "強気"
+        elif adjusted_total_score >= 60:
+            adjusted_market_judgment = "やや強気"
+        elif adjusted_total_score >= 40:
+            adjusted_market_judgment = "中立"
+        elif adjusted_total_score >= 30:
+            adjusted_market_judgment = "やや弱気"
+        else:
+            adjusted_market_judgment = "弱気"
+
         st.info(
             f"📊 スコア変化："
             f"状態 {result['total_score']:.1f}点 "
             f"→ 変化補正 {flow_score_adjustment:+.1f}点 "
-            f"→ 短期補正後 {adjusted_total_score:.1f}点"
+            f"→ 短期総合 {adjusted_total_score:.1f}点 "
+            f"（{adjusted_market_judgment}）"
         )
 
         st.warning(
@@ -1437,7 +1449,7 @@ if st.button(
             f"｜ 状態スコア：{result['total_score']:.1f}点 "
             f"｜ 短期補正：{flow_score_adjustment:+.1f}点 "
             f"｜ 短期総合：{adjusted_total_score:.1f}点 "
-            f"｜ 評価：{result['stars']} "
+            f"｜ 短期判定：{adjusted_market_judgment} "            
             f"｜ 🧭 状態×変化：{state_change_interpretation} "
             f"｜ 🔄 前日比：{flow_change_judgment} "
             f"（Call {call_share_change:+.1f}pt） "

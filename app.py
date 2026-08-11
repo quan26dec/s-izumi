@@ -855,6 +855,34 @@ if st.button(
             f"前日比では「{flow_change_judgment}」です。"
         )
 
+        if weighted_judgment == "Call側優勢":
+            if call_share_change >= 5:
+                total_flow_signal = "🚀 Call優勢が強まり中"
+            elif call_share_change <= -5:
+                total_flow_signal = "⚠️ Call優勢だがPut方向へ急変"
+            else:
+                total_flow_signal = "📈 Call優勢を維持"
+
+        elif weighted_judgment == "Put側優勢":
+            if call_share_change <= -5:
+                total_flow_signal = "🚨 Put優勢が強まり中"
+            elif call_share_change >= 5:
+                total_flow_signal = "⚠️ Put優勢だがCall方向へ急変"
+            else:
+                total_flow_signal = "📉 Put優勢を維持"
+
+        else:
+            if call_share_change >= 5:
+                total_flow_signal = "↗️ 拮抗からCall方向へ変化"
+            elif call_share_change <= -5:
+                total_flow_signal = "↘️ 拮抗からPut方向へ変化"
+            else:
+                total_flow_signal = "⚖️ 方向感なし"
+
+        st.warning(
+            f"総合変化シグナル：{total_flow_signal}"
+        )
+
         st.progress(int(call_weighted_share))
 
         st.caption(

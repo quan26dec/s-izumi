@@ -1434,12 +1434,14 @@ if st.button(
 
         summary_placeholder.info(
             f"⭐ 状態判定：{result['market_judgment']} "
-            f"| スコア：{result['total_score']:.1f}点 "
-            f"| 評価：{result['stars']} "
-            f"| 🧭 状態×変化：{state_change_interpretation} "
-            f"| 🔄 前日比：{flow_change_judgment} "
-            f"(Call {call_share_change:+.1f}pt) "
-            f"| ⚔ 直近攻防：{battle_range_text}"
+            f"｜ 状態スコア：{result['total_score']:.1f}点 "
+            f"｜ 短期補正：{flow_score_adjustment:+.1f}点 "
+            f"｜ 短期総合：{adjusted_total_score:.1f}点 "
+            f"｜ 評価：{result['stars']} "
+            f"｜ 🧭 状態×変化：{state_change_interpretation} "
+            f"｜ 🔄 前日比：{flow_change_judgment} "
+            f"（Call {call_share_change:+.1f}pt） "
+            f"｜ ⚔ 直近攻防：{battle_range_text}"
         )
 
         st.subheader("🎯 現在値に近い建玉ランキング")

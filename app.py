@@ -566,6 +566,24 @@ if st.button(
             .head(5)
         )
 
+        if not near_call_increase.empty and not near_put_increase.empty:
+            nearest_call = near_call_increase.sort_values("現在値との差").iloc[0]
+            nearest_put = near_put_increase.sort_values("現在値との差").iloc[0]
+
+            call_distance = nearest_call["Strike"] - result["current_price"]
+            put_distance = nearest_put["Strike"] - result["current_price"]
+
+            st.info(
+                f"🎯 直近建玉増加："
+                f"Call {nearest_call['Strike']:,.0f}円 "
+                f"+{nearest_call['OI_change']:,.0f}枚 "
+                f"（現在値から {call_distance:+,.0f}円）"
+                f" ｜ "
+                f"Put {nearest_put['Strike']:,.0f}円 "
+                f"+{nearest_put['OI_change']:,.0f}枚 "
+                f"（現在値から {put_distance:+,.0f}円）"
+            )
+
         near_col1, near_col2 = st.columns(2)
 
         with near_col1:

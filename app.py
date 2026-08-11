@@ -504,7 +504,7 @@ if st.button(
                 st.metric(
                     "Call 最大増加",
                     f"{top_call_up['Strike']:,.0f}円",
-                    f"+{top_call_up['OI_change']:,.0f}枚",
+                    f"+{top_call_up['OI_change']:,.0f}枚 ｜ 現在値から {top_call_up['Strike'] - result['current_price']:+,.0f}円",
                 )
 
         if not put_ranking.empty:
@@ -513,7 +513,7 @@ if st.button(
                 st.metric(
                     "Put 最大増加",
                     f"{top_put_up['Strike']:,.0f}円",
-                    f"+{top_put_up['OI_change']:,.0f}枚",
+                    f"+{top_put_up['OI_change']:,.0f}枚 ｜ 現在値から {top_put_up['Strike'] - result['current_price']:+,.0f}円",
                 )
 
         if not call_decrease_ranking.empty:
@@ -522,7 +522,7 @@ if st.button(
                 st.metric(
                     "Call 最大減少",
                     f"{top_call_down['Strike']:,.0f}円",
-                    f"{top_call_down['OI_change']:,.0f}枚",
+                    f"{top_call_down['OI_change']:,.0f}枚 ｜ 現在値から {top_call_down['Strike'] - result['current_price']:+,.0f}円",
                 )
 
         if not put_decrease_ranking.empty:
@@ -531,7 +531,7 @@ if st.button(
                 st.metric(
                     "Put 最大減少",
                     f"{top_put_down['Strike']:,.0f}円",
-                    f"{top_put_down['OI_change']:,.0f}枚",
+                    f"{top_put_down['OI_change']:,.0f}枚 ｜ 現在値から {top_put_down['Strike'] - result['current_price']:+,.0f}円",
                 )
 
         st.markdown("### 🎯 現在値周辺の建玉増加")

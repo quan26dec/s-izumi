@@ -879,6 +879,32 @@ if st.button(
             else:
                 total_flow_signal = "⚖️ 方向感なし"
 
+        if result["market_judgment"] in ["強気", "やや強気"]:
+            if "Put" in total_flow_signal:
+                state_change_interpretation = "⚠️ 強気構造に悪化シグナル"
+            elif "Call" in total_flow_signal:
+                state_change_interpretation = "🟢 強気構造を維持・強化"
+            else:
+                state_change_interpretation = "🟡 強気構造だが変化は限定的"
+
+        elif result["market_judgment"] in ["弱気", "やや弱気"]:
+            if "Call" in total_flow_signal:
+                state_change_interpretation = "🔄 弱気構造に改善シグナル"
+            elif "Put" in total_flow_signal:
+                state_change_interpretation = "🔴 弱気構造を維持・悪化"
+            else:
+                state_change_interpretation = "🟡 弱気構造だが変化は限定的"
+
+        else:
+            if "Call" in total_flow_signal:
+                state_change_interpretation = "↗️ 中立構造からCall方向へ変化"
+            elif "Put" in total_flow_signal:
+                state_change_interpretation = "↘️ 中立構造からPut方向へ変化"
+            else:
+                state_change_interpretation = "⚖️ 状態・変化ともに中立"
+
+        st.info(f"🧭 状態×変化判定：{state_change_interpretation}")
+
         st.warning(
             f"総合変化シグナル：{total_flow_signal}"
         )
@@ -1385,12 +1411,12 @@ if st.button(
 
         summary_placeholder.info(
             f"⭐ 状態判定：{result['market_judgment']} "
-            f"｜ スコア：{result['total_score']:.1f}点 "
-            f"｜ 評価：{result['stars']} "
-            f"｜ 🚦 変化シグナル：{total_flow_signal} "
-            f"｜ 🔄 前日比：{flow_change_judgment} "
-            f"（Call {call_share_change:+.1f}pt） "
-            f"｜ ⚔ 直近攻防：{battle_range_text}"
+            f"| スコア：{result['total_score']:.1f}点 "
+            f"| 評価：{result['stars']} "
+            f"| 🧭 状態×変化：{state_change_interpretation} "
+            f"| 🔄 前日比：{flow_change_judgment} "
+            f"(Call {call_share_change:+.1f}pt) "
+            f"| ⚔ 直近攻防：{battle_range_text}"
         )
 
         st.subheader("🎯 現在値に近い建玉ランキング")

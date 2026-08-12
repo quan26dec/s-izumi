@@ -1520,8 +1520,15 @@ if st.button(
             }
         ])
 
-        st.write("🧪 履歴保存テスト")
-        st.dataframe(history_row, use_container_width=True)
+        gas_url = st.secrets["GAS_URL"]
+
+        test_payload = history_row.iloc[0].to_dict()
+
+        response = requests.post(
+            gas_url,
+            json=test_payload,
+            timeout=20,
+        )
 
         history_file = "nikkei225_option_history.csv"
 

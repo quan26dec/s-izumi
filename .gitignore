@@ -1,0 +1,3 @@
+.streamlit/secrets.toml
+__pycache__/
+nikkei225_option_history.csv

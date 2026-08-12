@@ -966,6 +966,28 @@ if st.button(
             f"（{adjusted_market_judgment}）"
         )
 
+        conservative_score = max(
+            0.0,
+            min(100.0, result["total_score"] + call_share_change * 0.25),
+        )
+
+        standard_score = max(
+            0.0,
+            min(100.0, result["total_score"] + call_share_change * 0.50),
+        )
+
+        aggressive_score = max(
+            0.0,
+            min(100.0, result["total_score"] + call_share_change * 0.75),
+        )
+
+        st.caption(
+            f"補正感度："
+            f"0.25倍 → {conservative_score:.1f}点 ｜ "
+            f"0.50倍 → {standard_score:.1f}点 ｜ "
+            f"0.75倍 → {aggressive_score:.1f}点"
+        )
+
         st.warning(
             f"総合変化シグナル：{total_flow_signal}"
         )

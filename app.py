@@ -1523,6 +1523,14 @@ if st.button(
         st.write("🧪 履歴保存テスト")
         st.dataframe(history_row, use_container_width=True)
 
+        history_file = "nikkei225_option_history.csv"
+
+        history_row.to_csv(
+            history_file,
+            index=False,
+            encoding="utf-8-sig",
+        )
+
         st.subheader("🎯 現在値に近い建玉ランキング")
 
         ranking_df = option_df.copy()

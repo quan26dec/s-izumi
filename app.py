@@ -1505,6 +1505,24 @@ if st.button(
             f"｜ ⚔ 直近攻防：{battle_range_text}"
         )
 
+        history_row = pd.DataFrame([
+            {
+                "Date": data_date.strftime("%Y-%m-%d"),
+                "CurrentPrice": result["current_price"],
+                "StateScore": result["total_score"],
+                "FlowAdjustment": flow_score_adjustment,
+                "AdjustedScore": adjusted_total_score,
+                "StateJudgment": result["market_judgment"],
+                "AdjustedJudgment": adjusted_market_judgment,
+                "CallShareChange": call_share_change,
+                "FlowSignal": total_flow_signal,
+                "JudgmentGap": judgment_gap_signal,
+            }
+        ])
+
+        st.write("🧪 履歴保存テスト")
+        st.dataframe(history_row, use_container_width=True)
+
         st.subheader("🎯 現在値に近い建玉ランキング")
 
         ranking_df = option_df.copy()

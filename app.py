@@ -932,6 +932,32 @@ if st.button(
         else:
             adjusted_market_judgment = "弱気"
 
+        # 状態判定と短期判定の乖離を判定
+        judgment_levels = {
+            "弱気": 0,
+            "やや弱気": 1,
+            "中立": 2,
+            "やや強気": 3,
+            "強気": 4,
+        }
+
+        state_level = judgment_levels[result["market_judgment"]]
+        short_level = judgment_levels[adjusted_market_judgment]
+
+        judgment_gap = short_level - state_level
+
+        if judgment_gap >= 1:
+            judgment_gap_signal = "🔄 判定改善"
+        elif judgment_gap <= -1:
+            judgment_gap_signal = "⚠️ 判定悪化"
+        else:
+            judgment_gap_signal = "➡️ 判定維持"
+
+        st.caption(
+            f"判定差：{judgment_gap_signal} "
+            f"（状態：{result['market_judgment']} → 短期：{adjusted_market_judgment}）"
+        )
+
         st.info(
             f"📊 スコア変化："
             f"状態 {result['total_score']:.1f}点 "

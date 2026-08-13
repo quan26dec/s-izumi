@@ -2097,6 +2097,44 @@ if st.button(
         else:
             st.info("➡️ 需給は前営業日から横ばいです")
 
+        # オプション需給乖離の継続日数
+        gap_series = (
+            score_history["AdjustedScore"] - score_history["StateScore"]
+        ).tolist()
+
+        latest_gap = gap_series[-1]
+
+        if latest_gap > 0:
+            gap_streak_count = 0
+
+            for gap in reversed(gap_series):
+                if gap > 0:
+                    gap_streak_count += 1
+                else:
+                    break
+
+            st.info(
+                f"🐂 {gap_streak_count}営業日連続で"
+                "オプション需給が基礎需給を上回っています"
+            )
+
+        elif latest_gap < 0:
+            gap_streak_count = 0
+
+            for gap in reversed(gap_series):
+                if gap < 0:
+                    gap_streak_count += 1
+                else:
+                    break
+
+            st.info(
+                f"🐻 {gap_streak_count}営業日連続で"
+                "オプション需給が基礎需給を下回っています"
+            )
+
+        else:
+            st.info("➡️ オプション需給と基礎需給は同水準です")
+
         st.line_chart(chart_data)
 
         st.markdown("#### 📋 過去の需給履歴")

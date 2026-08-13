@@ -2139,3 +2139,41 @@ if st.button(
 
         st.markdown("#### 📋 過去の需給履歴")
         st.dataframe(sheet_history, width="stretch", hide_index=True)
+
+        # ==========================================
+        # オプションフローの推移
+        # ==========================================
+
+        st.markdown("#### 🌊 オプションフローの推移")
+
+        flow_history = sheet_history.copy()
+
+        flow_history["Date"] = pd.to_datetime(
+            flow_history["Date"],
+            errors="coerce"
+        )
+
+        flow_history["FlowAdjustment"] = pd.to_numeric(
+            flow_history["FlowAdjustment"],
+            errors="coerce"
+        )
+
+        flow_history["CallShareChange"] = pd.to_numeric(
+            flow_history["CallShareChange"],
+            errors="coerce"
+        )
+
+        flow_history = (
+            flow_history
+            .dropna(subset=["Date", "FlowAdjustment", "CallShareChange"])
+            .sort_values("Date")
+        )
+
+        flow_history["表示日"] = flow_history["Date"].dt.strftime("%m/%d")
+
+        flow_chart_data = (
+            flow_history
+            .set_index("表示日")[["FlowAdjustment", "CallShareChange"]]
+        )
+
+        st.line_chart(flow_chart_data)        

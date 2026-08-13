@@ -2220,3 +2220,34 @@ if st.button(
                 f"{flow_turn_strength:+.1f}ポイント",
                 help=strength_judgment
             )
+
+            # 反転の質を判定
+            if previous_call_share < 0 and latest_call_share > 0:
+                if flow_turn_strength >= 20:
+                    reversal_quality = "🟢 強い強気転換"
+                    reversal_detail = "Put優勢からCall優勢へ反転し、変化幅も非常に大きいです"
+                elif flow_turn_strength >= 10:
+                    reversal_quality = "🟢 明確な強気転換"
+                    reversal_detail = "Put優勢からCall優勢へ明確に反転しています"
+                else:
+                    reversal_quality = "🟡 小幅な強気転換"
+                    reversal_detail = "Call側へ反転しましたが、変化幅はまだ限定的です"
+
+            elif previous_call_share > 0 and latest_call_share < 0:
+                if flow_turn_strength <= -20:
+                    reversal_quality = "🔴 強い弱気転換"
+                    reversal_detail = "Call優勢からPut優勢へ反転し、変化幅も非常に大きいです"
+                elif flow_turn_strength <= -10:
+                    reversal_quality = "🔴 明確な弱気転換"
+                    reversal_detail = "Call優勢からPut優勢へ明確に反転しています"
+                else:
+                    reversal_quality = "🟡 小幅な弱気転換"
+                    reversal_detail = "Put側へ反転しましたが、変化幅はまだ限定的です"
+
+            else:
+                reversal_quality = "➡️ 明確な反転なし"
+                reversal_detail = "Call・Putの優勢方向そのものは前営業日から反転していません"
+
+            st.info(
+                f"{reversal_quality}｜{reversal_detail}"
+            )            

@@ -1934,3 +1934,32 @@ if st.button(
         st.error(
             f"データ処理中にエラーが発生しました：{e}"
         )
+
+    # ========================================
+    # Google Sheets 履歴読み込みテスト
+    # ========================================
+
+    st.markdown("### 📚 Google Sheets 履歴読み込みテスト")
+
+    try:
+        gas_url = st.secrets["GAS_URL"]
+
+        history_response = requests.get(
+            gas_url,
+            timeout=20,
+        )
+
+        history_response.raise_for_status()
+        history_json = history_response.json()
+
+        if history_json.get("status") == "success":
+            sheet_history = pd.DataFrame(history_json.get("data", []))
+
+            st.success("Google Sheetsから履歴を取得できました")
+            st.dataframe(sheet_history, width="stretch")
+
+        else:
+            st.error(f"履歴取得エラー: {history_json}")
+
+    except Exception as e:
+        st.error(f"Google Sheets履歴の読み込みに失敗しました: {e}")        

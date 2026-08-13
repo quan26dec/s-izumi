@@ -2177,3 +2177,28 @@ if st.button(
         )
 
         st.line_chart(flow_chart_data)        
+
+        # ==========================================
+        # オプションフローの転換判定
+        # ==========================================
+
+        if len(flow_history) >= 2:
+            previous_call_share = flow_history.iloc[-2]["CallShareChange"]
+            latest_call_share = flow_history.iloc[-1]["CallShareChange"]
+
+            if previous_call_share < 0 and latest_call_share > 0:
+                flow_turn_judgment = "🔄 Put優勢 → Call優勢へ反転"
+
+            elif previous_call_share > 0 and latest_call_share < 0:
+                flow_turn_judgment = "🔄 Call優勢 → Put優勢へ反転"
+
+            elif previous_call_share > 0 and latest_call_share > 0:
+                flow_turn_judgment = "📈 Call優勢を継続"
+
+            elif previous_call_share < 0 and latest_call_share < 0:
+                flow_turn_judgment = "📉 Put優勢を継続"
+
+            else:
+                flow_turn_judgment = "➡️ フローは中立圏"
+
+            st.info(flow_turn_judgment)

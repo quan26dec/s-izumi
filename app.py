@@ -2052,6 +2052,51 @@ if st.button(
                 help=gap_judgment
             )
 
+        # 改善・悪化の連続営業日数
+        if len(score_history) >= 2:
+
+            score_series = score_history["AdjustedScore"].tolist()
+
+            last_diff = score_series[-1] - score_series[-2]
+
+        if last_diff > 0:
+            streak_direction = "改善"
+            streak_icon = "📈"
+            streak_count = 1
+
+            for i in range(len(score_series) - 2, 0, -1):
+                diff = score_series[i] - score_series[i - 1]
+
+                if diff > 0:
+                    streak_count += 1
+                else:
+                    break
+
+        elif last_diff < 0:
+            streak_direction = "悪化"
+            streak_icon = "📉"
+            streak_count = 1
+
+            for i in range(len(score_series) - 2, 0, -1):
+                diff = score_series[i] - score_series[i - 1]
+
+                if diff < 0:
+                    streak_count += 1
+                else:
+                    break
+
+        else:
+            streak_direction = "横ばい"
+            streak_icon = "➡️"
+            streak_count = 0
+
+        if streak_count > 0:
+            st.info(
+                f"{streak_icon} {streak_count}営業日連続で需給が{streak_direction}しています"
+            )
+        else:
+            st.info("➡️ 需給は前営業日から横ばいです")
+
         st.line_chart(chart_data)
 
         st.markdown("#### 📋 過去の需給履歴")

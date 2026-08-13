@@ -1963,3 +1963,36 @@ if st.button(
 
     except Exception as e:
         st.error(f"Google Sheets履歴の読み込みに失敗しました: {e}")        
+
+
+    # ========================================
+    # 総合需給スコア 履歴グラフ
+    # ========================================
+
+    if "sheet_history" in locals() and not sheet_history.empty:
+
+        st.markdown("### 📈 総合需給スコアの推移")
+
+        score_history = sheet_history.copy()
+
+        score_history["Date"] = pd.to_datetime(
+            score_history["Date"],
+            errors="coerce"
+        )
+
+        score_history["AdjustedScore"] = pd.to_numeric(
+            score_history["AdjustedScore"],
+            errors="coerce"
+        )
+
+        score_history = (
+            score_history
+            .dropna(subset=["Date", "AdjustedScore"])
+            .sort_values("Date")
+        )
+
+        st.line_chart(
+            score_history,
+            x="Date",
+            y="AdjustedScore",
+        )

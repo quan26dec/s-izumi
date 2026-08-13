@@ -1991,8 +1991,12 @@ if st.button(
             .sort_values("Date")
         )
 
-        st.line_chart(
-            score_history,
-            x="Date",
-            y="AdjustedScore",
+        # 横軸を営業日だけの表示にする
+        score_history["表示日"] = score_history["Date"].dt.strftime("%m/%d")
+
+        chart_data = (
+            score_history
+            .set_index("表示日")[["AdjustedScore"]]
         )
+
+        st.line_chart(chart_data)

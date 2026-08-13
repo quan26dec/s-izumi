@@ -2316,3 +2316,17 @@ if st.button(
 
             with detail_col4:
                 st.metric("オプションフロー", f"{flow_points}/25")
+
+            # トレンド方向判定
+            if latest_score >= 60 and score_change > 0 and score_gap > 0:
+                trend_direction = "🟢 強気トレンド形成中"
+
+            elif latest_score < 40 and score_change < 0 and score_gap < 0:
+                trend_direction = "🔴 弱気トレンド形成中"
+
+            else:
+                trend_direction = "⚪ 方向感なし"
+
+            st.info(
+                f"{trend_direction}｜信頼度 {trend_confidence}点"
+            )

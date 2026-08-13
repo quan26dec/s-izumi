@@ -2330,3 +2330,44 @@ if st.button(
             st.info(
                 f"{trend_direction}｜信頼度 {trend_confidence}点"
             )
+
+            # 需給トレンド総合サマリー
+            st.markdown("### 🧭 需給トレンド総合サマリー")
+
+            summary_col1, summary_col2 = st.columns(2)
+
+            with summary_col1:
+                st.metric(
+                    "総合判定",
+                    trend_direction
+                )
+
+                st.metric(
+                    "信頼度",
+                    f"{trend_confidence}点"
+                )
+
+                st.metric(
+                    "前営業日比",
+                    f"{score_change:+.1f}点"
+                )
+
+            with summary_col2:
+                st.metric(
+                    "需給乖離",
+                    f"{score_gap:+.1f}点"
+                )
+
+                st.write(
+                    f"**オプションフロー:** {flow_turn_judgment}"
+                )
+
+                if streak_count > 0:
+                    st.write(
+                        f"**継続性:** {streak_icon} "
+                        f"{streak_count}営業日連続で需給が{streak_direction}"
+                    )
+                else:
+                    st.write(
+                        "**継続性:** ➡️ 前営業日から横ばい"
+                    )

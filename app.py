@@ -2367,3 +2367,29 @@ if st.button(
                     st.write(
                         "**継続性:** ➡️ 前営業日から横ばい"
                     )
+
+            # 最終シグナル
+            if trend_direction.startswith("🟢") and trend_confidence >= 80:
+                final_signal = "🟢 強い強気"
+                final_message = "需給・フロー・前日変化がそろって強気方向です"
+
+            elif trend_direction.startswith("🟢") and trend_confidence >= 60:
+                final_signal = "🔵 強気"
+                final_message = "強気方向ですが、確認材料はやや少なめです"
+
+            elif trend_direction.startswith("🔴") and trend_confidence >= 80:
+                final_signal = "🔴 強い弱気"
+                final_message = "需給・フロー・前日変化がそろって弱気方向です"
+
+            elif trend_direction.startswith("🔴") and trend_confidence >= 60:
+                final_signal = "🟠 弱気"
+                final_message = "弱気方向ですが、確認材料はやや少なめです"
+
+            else:
+                final_signal = "⚪ 中立"
+                final_message = "方向感がまだ十分に揃っていません"
+
+            st.markdown("### 🚦 最終シグナル")
+            st.info(
+                f"{final_signal}｜{final_message}"
+            )

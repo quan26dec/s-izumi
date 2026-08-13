@@ -2251,3 +2251,42 @@ if st.button(
             st.info(
                 f"{reversal_quality}｜{reversal_detail}"
             )            
+
+            # トレンド信頼度
+            trend_confidence = 0
+
+            if latest_score >= 70:
+                trend_confidence += 25
+            elif latest_score >= 60:
+                trend_confidence += 15
+
+            if score_change >= 5:
+                trend_confidence += 25
+            elif score_change > 0:
+                trend_confidence += 15
+
+            if score_gap >= 5:
+                trend_confidence += 25
+            elif score_gap > 0:
+                trend_confidence += 15
+
+            if flow_turn_strength >= 20:
+                trend_confidence += 25
+            elif flow_turn_strength >= 10:
+                trend_confidence += 15            
+
+            # 信頼度判定
+            if trend_confidence >= 80:
+                confidence_judgment = "🟢 非常に高い"
+            elif trend_confidence >= 60:
+                confidence_judgment = "🔵 高い"
+            elif trend_confidence >= 40:
+                confidence_judgment = "🟡 中程度"
+            else:
+                confidence_judgment = "⚪ 低い"
+
+            st.metric(
+                "トレンド信頼度",
+                f"{trend_confidence}点",
+                help=confidence_judgment
+            )

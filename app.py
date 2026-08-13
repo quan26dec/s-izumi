@@ -1980,6 +1980,11 @@ if st.button(
             errors="coerce"
         )
 
+        score_history["StateScore"] = pd.to_numeric(
+            score_history["StateScore"],
+            errors="coerce"
+        )
+
         score_history["AdjustedScore"] = pd.to_numeric(
             score_history["AdjustedScore"],
             errors="coerce"
@@ -1987,7 +1992,7 @@ if st.button(
 
         score_history = (
             score_history
-            .dropna(subset=["Date", "AdjustedScore"])
+            .dropna(subset=["Date", "StateScore", "AdjustedScore"])
             .sort_values("Date")
         )
 
@@ -1996,7 +2001,7 @@ if st.button(
 
         chart_data = (
             score_history
-            .set_index("表示日")[["AdjustedScore"]]
+            .set_index("表示日")[["StateScore", "AdjustedScore"]]
         )
 
         st.line_chart(chart_data)

@@ -2255,25 +2255,37 @@ if st.button(
             # トレンド信頼度
             trend_confidence = 0
 
+            base_score_points = 0
+            change_points = 0
+            gap_points = 0
+            flow_points = 0
+
             if latest_score >= 70:
-                trend_confidence += 25
+                base_score_points = 25
             elif latest_score >= 60:
-                trend_confidence += 15
+                base_score_points = 15
 
             if score_change >= 5:
-                trend_confidence += 25
+                change_points = 25
             elif score_change > 0:
-                trend_confidence += 15
+                change_points = 15
 
             if score_gap >= 5:
-                trend_confidence += 25
+                gap_points = 25
             elif score_gap > 0:
-                trend_confidence += 15
+                gap_points = 15
 
             if flow_turn_strength >= 20:
-                trend_confidence += 25
+                flow_points = 25
             elif flow_turn_strength >= 10:
-                trend_confidence += 15            
+                flow_points = 15
+
+            trend_confidence = (
+                base_score_points
+                + change_points
+                + gap_points
+                + flow_points
+            )   
 
             # 信頼度判定
             if trend_confidence >= 80:
@@ -2290,3 +2302,17 @@ if st.button(
                 f"{trend_confidence}点",
                 help=confidence_judgment
             )
+
+            detail_col1, detail_col2, detail_col3, detail_col4 = st.columns(4)
+
+            with detail_col1:
+                st.metric("基礎需給", f"{base_score_points}/25")
+
+            with detail_col2:
+                st.metric("前営業日変化", f"{change_points}/25")
+
+            with detail_col3:
+                st.metric("需給乖離", f"{gap_points}/25")
+
+            with detail_col4:
+                st.metric("オプションフロー", f"{flow_points}/25")

@@ -2202,3 +2202,21 @@ if st.button(
                 flow_turn_judgment = "➡️ フローは中立圏"
 
             st.info(flow_turn_judgment)
+
+            # オプションフロー変化の強さ
+            flow_turn_strength = latest_call_share - previous_call_share
+
+            if abs(flow_turn_strength) >= 20:
+                strength_judgment = "🔥 非常に大きな変化"
+            elif abs(flow_turn_strength) >= 10:
+                strength_judgment = "⚡ 大きな変化"
+            elif abs(flow_turn_strength) >= 5:
+                strength_judgment = "📊 明確な変化"
+            else:
+                strength_judgment = "➡️ 小さな変化"
+
+            st.metric(
+                "オプションフロー変化幅",
+                f"{flow_turn_strength:+.1f}ポイント",
+                help=strength_judgment
+            )

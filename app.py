@@ -2017,7 +2017,7 @@ if st.button(
         else:
             change_judgment = "➡️ 横ばい"
 
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
 
         with col1:
             st.metric(
@@ -2029,6 +2029,27 @@ if st.button(
             st.metric(
                 "需給変化",
                 change_judgment
+            )
+
+        # StateScore と AdjustedScore の乖離
+        score_gap = latest_score - score_history.iloc[-1]["StateScore"]
+
+        if score_gap >= 5:
+            gap_judgment = "🐂 需給が強気"
+        elif score_gap > 0:
+            gap_judgment = "↗️ やや強気"
+        elif score_gap <= -5:
+            gap_judgment = "🐻 需給が弱気"
+        elif score_gap < 0:
+            gap_judgment = "↘️ やや弱気"
+        else:
+            gap_judgment = "➡️ 中立"
+
+        with col3:
+            st.metric(
+                "需給乖離",
+                f"{score_gap:+.1f}点",
+                help=gap_judgment
             )
 
         st.line_chart(chart_data)

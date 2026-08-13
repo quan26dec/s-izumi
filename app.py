@@ -1999,6 +1999,38 @@ if st.button(
             .set_index("表示日")[["StateScore", "AdjustedScore"]]
         )
 
+    # 前営業日からの需給変化
+    if len(score_history) >= 2:
+        latest_score = score_history.iloc[-1]["AdjustedScore"]
+        previous_score = score_history.iloc[-2]["AdjustedScore"]
+
+        score_change = latest_score - previous_score
+
+        if score_change >= 5:
+            change_judgment = "📈 大きく改善"
+        elif score_change > 0:
+            change_judgment = "↗️ 改善"
+        elif score_change <= -5:
+            change_judgment = "📉 大きく悪化"
+        elif score_change < 0:
+            change_judgment = "↘️ 悪化"
+        else:
+            change_judgment = "➡️ 横ばい"
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.metric(
+                "前営業日比",
+                f"{score_change:+.1f}点"
+            )
+
+        with col2:
+            st.metric(
+                "需給変化",
+                change_judgment
+            )
+
         st.line_chart(chart_data)
 
         st.markdown("#### 📋 過去の需給履歴")

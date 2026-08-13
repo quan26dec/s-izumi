@@ -1939,8 +1939,6 @@ if st.button(
     # Google Sheets 履歴読み込みテスト
     # ========================================
 
-    st.markdown("### 📚 Google Sheets 履歴読み込みテスト")
-
     try:
         gas_url = st.secrets["GAS_URL"]
 
@@ -1955,9 +1953,6 @@ if st.button(
         if history_json.get("status") == "success":
             sheet_history = pd.DataFrame(history_json.get("data", []))
 
-            st.success("Google Sheetsから履歴を取得できました")
-            st.dataframe(sheet_history, width="stretch")
-
         else:
             st.error(f"履歴取得エラー: {history_json}")
 
@@ -1971,7 +1966,7 @@ if st.button(
 
     if "sheet_history" in locals() and not sheet_history.empty:
 
-        st.markdown("### 📈 総合需給スコアの推移")
+        st.markdown("### 📈 需給トレンド")
 
         score_history = sheet_history.copy()
 
@@ -2005,3 +2000,6 @@ if st.button(
         )
 
         st.line_chart(chart_data)
+
+        st.markdown("#### 📋 過去の需給履歴")
+        st.dataframe(sheet_history, width="stretch", hide_index=True)

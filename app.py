@@ -69,6 +69,42 @@ def fetch_latest_option_data(
         "オプションデータが見つかりませんでした。"
     )
 
+def fetch_option_data_by_date(
+    url: str,
+    headers: dict,
+    target_date: date,
+):
+    """
+    指定した日付の日経225オプションデータを取得します。
+    バックフィル用です。
+    """
+
+    date_text = target_date.strftime("%Y%m%d")
+
+    response = requests.get(
+        url,
+        headers=headers,
+        params={
+            "date": date_text,
+        },
+        timeout=30,
+    )
+
+    response.raise_for_status()
+
+    response_data = response.json()
+    records = response_data.get("data", [])
+
+    if not records:
+        raise ValueError(
+            f"{target_date:%Y年%m月%d日}の"
+            "オプションデータが見つかりませんでした。"
+        )
+
+    option_df = pd.DataFrame(records)
+
+    return option_df, target_date
+
 def fetch_previous_option_data(
     url: str,
     headers: dict,

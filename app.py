@@ -2233,9 +2233,16 @@ if st.button(
 
         flow_history["Date"] = pd.to_datetime(
             flow_history["Date"],
-            errors="coerce"
+            errors="coerce",
         )
-
+        
+        flow_history = (
+            flow_history
+            .dropna(subset=["Date"])
+            .drop_duplicates(subset=["Date"], keep="last")
+            .sort_values("Date")
+        )
+        
         flow_history["FlowAdjustment"] = pd.to_numeric(
             flow_history["FlowAdjustment"],
             errors="coerce"

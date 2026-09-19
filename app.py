@@ -148,17 +148,40 @@ def fetch_previous_option_data(
         "オプションデータが見つかりませんでした。"
     )
 
+st.markdown("### 📅 データ取得モード")
+
+data_mode = st.radio(
+    "取得するデータ",
+    ["最新営業日", "過去日付を指定"],
+    horizontal=True,
+)
+
+if data_mode == "過去日付を指定":
+    selected_date = st.date_input(
+        "取得する日付",
+        value=date.today(),
+    )
+else:
+    selected_date = None
+
 if st.button(
     "J-Quantsへ接続する",
     type="primary",
 ):
 
     try:
-        option_df, data_date = fetch_latest_option_data(
-            url=url,
-            headers=headers,
-            max_lookback_days=10,
-        )
+        if data_mode == "過去日付を指定":
+            option_df, data_date = fetch_option_data_by_date(
+                url=url,
+                headers=headers,
+                target_date=selected_date,
+            )
+        else:
+            option_df, data_date = fetch_latest_option_data(
+                url=url,
+                headers=headers,
+                max_lookback_days=10,
+            )
 
         previous_df, previous_date = fetch_previous_option_data(
             url=url,

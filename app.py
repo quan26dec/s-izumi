@@ -2192,8 +2192,36 @@ if st.button(
 
         st.line_chart(chart_data)
 
+        # ==========================================
+        # 過去の需給履歴：日付順＋同一日重複防止
+        # ==========================================
+        
+        display_history = sheet_history.copy()
+        
+        display_history["Date"] = pd.to_datetime(
+            display_history["Date"],
+            errors="coerce",
+        )
+        
+        # 同じDateが複数ある場合は、最後に保存されたものを採用
+        display_history = (
+            display_history
+            .dropna(subset=["Date"])
+            .drop_duplicates(subset=["Date"], keep="last")
+            .sort_values("Date")
+        )
+        
+        # 表示用に YYYY-MM-DD に戻す
+        display_history["Date"] = (
+            display_history["Date"].dt.strftime("%Y-%m-%d")
+        )
+        
         st.markdown("#### 📋 過去の需給履歴")
-        st.dataframe(sheet_history, width="stretch", hide_index=True)
+        st.dataframe(
+            display_history,
+            width="stretch",
+            hide_index=True,
+        )
 
         # ==========================================
         # オプションフローの推移

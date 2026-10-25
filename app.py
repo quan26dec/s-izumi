@@ -465,6 +465,26 @@ if st.button(
         )
         # ===== 限月別建玉・前日比ここまで =====
 
+
+
+        # ===== SQ満期限月の消滅チェック =====
+        expired_cm = cm_previous.index.difference(cm_today.index)
+
+        if len(expired_cm) > 0:
+            for cm in expired_cm:
+                expired_put = cm_previous.loc[cm, "Put"]
+                expired_call = cm_previous.loc[cm, "Call"]
+                expired_total = expired_put + expired_call
+
+                st.warning(
+                    f"⚠️ 満期限月の消滅候補：{cm} ｜ "
+                    f"前日建玉 {expired_total:,.0f}枚 "
+                    f"（Put {expired_put:,.0f}枚 / "
+                    f"Call {expired_call:,.0f}枚）\n\n"
+                    "この減少は通常の建玉解消として解釈しないでください。"
+                )
+        # ===== SQ満期限月の消滅チェックここまで =====
+        
         
         st.subheader("📈 建玉増減ランキング")
 

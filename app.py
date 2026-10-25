@@ -407,6 +407,64 @@ if st.button(
         )
         # ===== 限月別建玉チェックここまで =====
 
+
+        # ===== 限月別建玉・前日比 =====
+        st.subheader("🔄 限月別 建玉前日比")
+
+        def make_cm_summary(df):
+            temp = df.copy()
+
+            temp["OI"] = pd.to_numeric(
+                temp["OI"], errors="coerce"
+            )
+            temp["PCDiv"] = pd.to_numeric(
+                temp["PCDiv"], errors="coerce"
+            )
+
+            temp = temp.dropna(
+                subset=["CM", "OI", "PCDiv"]
+            )
+
+            return (
+                temp.groupby(["CM", "PCDiv"])["OI"]
+                .sum()
+                .unstack(fill_value=0)
+                .reindex(columns=[1, 2], fill_value=0)
+                .rename(columns={
+                    1: "Put",
+                    2: "Call"
+                })
+            )
+
+        cm_today = make_cm_summary(option_df)
+        cm_previous = make_cm_summary(previous_df)
+
+        cm_change = (
+            cm_today
+            .subtract(cm_previous, fill_value=0)
+            .rename(columns={
+                "Put": "Put前日比",
+                "Call": "Call前日比"
+            })
+            .reset_index()
+            .sort_values("CM")
+        )
+
+        st.dataframe(
+            cm_change.style.format({
+                "Put前日比": "{:+,.0f}",
+                "Call前日比": "{:+,.0f}"
+            }),
+            width="stretch",
+            hide_index=True,
+        )
+
+        st.caption(
+            f"比較期間：{previous_date:%Y/%m/%d}"
+            f" → {data_date:%Y/%m/%d}"
+        )
+        # ===== 限月別建玉・前日比ここまで =====
+
         
         st.subheader("📈 建玉増減ランキング")
 

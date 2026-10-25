@@ -148,6 +148,40 @@ def fetch_previous_option_data(
         "オプションデータが見つかりませんでした。"
     )
 
+
+# ===== SQカレンダー =====
+def get_next_sq(today):
+    year = today.year
+    month = today.month
+
+    for _ in range(24):
+        first_day = date(year, month, 1)
+        days_until_friday = (4 - first_day.weekday()) % 7
+        second_friday = first_day + timedelta(days=days_until_friday + 7)
+
+        if second_friday >= today:
+            return second_friday
+
+        if month == 12:
+            year += 1
+            month = 1
+        else:
+            month += 1
+
+next_sq = get_next_sq(date.today())
+days_to_sq = (next_sq - date.today()).days
+
+st.markdown("### 📅 SQカレンダー")
+st.info(
+    f"次回SQ：{next_sq:%Y年%m月%d日}（金）"
+    f"｜ あと{days_to_sq}日"
+)
+
+if days_to_sq <= 7:
+    st.warning("⚠️ SQ接近中：限月交代による建玉変化に注意")
+# ===== SQカレンダーここまで =====
+
+
 st.markdown("### 📅 データ取得モード")
 
 data_mode = st.radio(

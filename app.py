@@ -373,6 +373,40 @@ if st.button(
             f"　｜　比較：{previous_date:%Y年%m月%d日} "
             f"（{len(previous_df):,}件）"
         )
+
+
+        # ===== 限月別建玉チェック =====
+        st.subheader("📅 限月別 建玉一覧")
+
+        cm_df = option_df.copy()
+
+        cm_df["OI"] = pd.to_numeric(
+            cm_df["OI"], errors="coerce"
+        )
+        cm_df["PCDiv"] = pd.to_numeric(
+            cm_df["PCDiv"], errors="coerce"
+        )
+
+        cm_df = cm_df.dropna(
+            subset=["CM", "OI", "PCDiv"]
+        )
+
+        cm_summary = (
+            cm_df.groupby(["CM", "PCDiv"])["OI"]
+            .sum()
+            .unstack(fill_value=0)
+            .rename(columns={1: "Put建玉", 2: "Call建玉"})
+            .reset_index()
+            .sort_values("CM")
+        )
+
+        st.dataframe(
+            cm_summary,
+            width="stretch",
+            hide_index=True,
+        )
+        # ===== 限月別建玉チェックここまで =====
+
         
         st.subheader("📈 建玉増減ランキング")
 

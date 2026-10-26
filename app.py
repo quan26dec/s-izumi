@@ -674,6 +674,64 @@ if st.button(
                     )
 
         # ===== SQ調整後 建玉増減サマリーここまで =====        
+
+        # ===== SQ調整後 現在値周辺TOP5 =====
+        st.markdown("### 🛡️ SQ調整後 現在値周辺の建玉増加")
+
+        sq_near_lower = result["current_price"] * 0.90
+        sq_near_upper = result["current_price"] * 1.10
+
+        sq_near_df = sq_strike_ranking[
+            (sq_strike_ranking["Strike"] >= sq_near_lower)
+            & (sq_strike_ranking["Strike"] <= sq_near_upper)
+            & (sq_strike_ranking["OI_change"] > 0)
+        ].copy()
+
+        sq_near_df["現在値との差"] = (
+            sq_near_df["Strike"] - result["current_price"]
+        ).abs()
+
+        sq_near_call = (
+            sq_near_df[sq_near_df["PCDiv"] == 2]
+            .sort_values("OI_change", ascending=False)
+            .head(5)
+        )
+
+        sq_near_put = (
+            sq_near_df[sq_near_df["PCDiv"] == 1]
+            .sort_values("OI_change", ascending=False)
+            .head(5)
+        )
+
+        sq_near_col1, sq_near_col2 = st.columns(2)
+
+        with sq_near_col1:
+            st.markdown("#### 📈 Call 現在値周辺 TOP5")
+            st.dataframe(
+                sq_near_call[
+                    ["Strike", "OI_change", "現在値との差"]
+                ].rename(columns={
+                    "Strike": "権利行使価格",
+                    "OI_change": "建玉増減",
+                }),
+                width="stretch",
+                hide_index=True,
+            )
+
+        with sq_near_col2:
+            st.markdown("#### 📉 Put 現在値周辺 TOP5")
+            st.dataframe(
+                sq_near_put[
+                    ["Strike", "OI_change", "現在値との差"]
+                ].rename(columns={
+                    "Strike": "権利行使価格",
+                    "OI_change": "建玉増減",
+                }),
+                width="stretch",
+                hide_index=True,
+            )
+
+        # ===== SQ調整後 現在値周辺TOP5ここまで =====
         
         st.subheader("📈 建玉増減ランキング")
 

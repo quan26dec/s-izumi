@@ -259,6 +259,22 @@ if st.button(
                 errors="coerce",
             )
 
+        # ===== 前日比較用 SQ調整データ =====
+        sq_previous_oi_df = previous_df[
+            previous_df["CM"].isin(previous_common_cm)
+        ].copy()
+
+        sq_two_days_ago_oi_df = two_days_ago_df[
+            two_days_ago_df["CM"].isin(previous_common_cm)
+        ].copy()
+
+        st.caption(
+            f"🛡️ SQ調整用データ："
+            f"前日 {len(sq_previous_oi_df):,}件 ｜ "
+            f"前々日 {len(sq_two_days_ago_oi_df):,}件"
+        )
+        # ===== 前日比較用 SQ調整データここまで =====
+        
         previous_oi_df_for_compare = (
             previous_oi_df_for_compare
             .groupby(

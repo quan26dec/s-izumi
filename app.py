@@ -485,6 +485,40 @@ if st.button(
                 )
         # ===== SQ満期限月の消滅チェックここまで =====
         
+
+        # ===== SQ調整後の建玉前日比 =====
+        st.subheader("🛡️ SQ調整後 建玉前日比")
+
+        common_cm = cm_today.index.intersection(
+            cm_previous.index
+        )
+
+        sq_adjusted_change = (
+            cm_today.loc[common_cm]
+            .subtract(cm_previous.loc[common_cm])
+            .rename(columns={
+                "Put": "Put前日比",
+                "Call": "Call前日比"
+            })
+            .reset_index()
+            .sort_values("CM")
+        )
+
+        st.dataframe(
+            sq_adjusted_change.style.format({
+                "Put前日比": "{:+,.0f}",
+                "Call前日比": "{:+,.0f}"
+            }),
+            width="stretch",
+            hide_index=True,
+        )
+
+        st.caption(
+            "両日に存在する限月のみを比較。"
+            "満期消滅した限月と新規登場した限月は除外しています。"
+        )
+        # ===== SQ調整後の建玉前日比ここまで =====
+
         
         st.subheader("📈 建玉増減ランキング")
 

@@ -732,6 +732,58 @@ if st.button(
             )
 
         # ===== SQ調整後 現在値周辺TOP5ここまで =====
+
+        # ===== SQ調整後 建玉変化バランス =====
+        st.markdown("### 🛡️ SQ調整後 建玉変化バランス")
+
+        sq_call_sum = sq_near_call["OI_change"].sum()
+        sq_put_sum = sq_near_put["OI_change"].sum()
+        sq_total_sum = sq_call_sum + sq_put_sum
+
+        if sq_total_sum > 0:
+            sq_call_share = sq_call_sum / sq_total_sum * 100
+            sq_put_share = 100 - sq_call_share
+        else:
+            sq_call_share = 0.0
+            sq_put_share = 0.0
+
+        if sq_total_sum == 0:
+            sq_balance = "判定対象なし"
+        elif sq_call_share >= 60:
+            sq_balance = "Call側の建玉増加が優勢"
+        elif sq_put_share >= 60:
+            sq_balance = "Put側の建玉増加が優勢"
+        else:
+            sq_balance = "Call・Putが拮抗"
+
+        sq_bal_col1, sq_bal_col2, sq_bal_col3 = st.columns(3)
+
+        with sq_bal_col1:
+            st.metric(
+                "Call建玉増加 合計",
+                f"{sq_call_sum:,.0f}枚",
+                f"{sq_call_share:.1f}%",
+            )
+
+        with sq_bal_col2:
+            st.metric(
+                "Put建玉増加 合計",
+                f"{sq_put_sum:,.0f}枚",
+                f"{sq_put_share:.1f}%",
+            )
+
+        with sq_bal_col3:
+            st.metric("建玉変化バランス", sq_balance)
+
+        st.progress(int(sq_call_share))
+
+        st.caption(
+            "現在値±10%以内の建玉増加TOP5をCall・Put別に集計。"
+            "左ほどPut側、右ほどCall側の増加が優勢です。"
+            "売買方向を示すものではありません。"
+        )
+
+        # ===== SQ調整後 建玉変化バランスここまで =====
         
         st.subheader("📈 建玉増減ランキング")
 

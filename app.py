@@ -784,6 +784,85 @@ if st.button(
         )
 
         # ===== SQ調整後 建玉変化バランスここまで =====
+
+        # ===== SQ調整後 距離加重スコア =====
+        st.markdown("### 🛡️ SQ調整後 距離加重・建玉変化スコア")
+
+        sq_distance_df = sq_near_df.copy()
+
+        sq_distance_df["距離ウェイト"] = (
+            1
+            / (
+                1
+                + sq_distance_df["現在値との差"]
+                / result["current_price"]
+                * 100
+            )
+        )
+
+        sq_distance_df["加重建玉増加"] = (
+            sq_distance_df["OI_change"]
+            * sq_distance_df["距離ウェイト"]
+        )
+
+        sq_call_weighted = sq_distance_df.loc[
+            sq_distance_df["PCDiv"] == 2,
+            "加重建玉増加"
+        ].sum()
+
+        sq_put_weighted = sq_distance_df.loc[
+            sq_distance_df["PCDiv"] == 1,
+            "加重建玉増加"
+        ].sum()
+
+        sq_weighted_total = sq_call_weighted + sq_put_weighted
+
+        if sq_weighted_total > 0:
+            sq_call_weighted_share = (
+                sq_call_weighted / sq_weighted_total * 100
+            )
+            sq_put_weighted_share = 100 - sq_call_weighted_share
+        else:
+            sq_call_weighted_share = 0.0
+            sq_put_weighted_share = 0.0
+
+        if sq_weighted_total == 0:
+            sq_weighted_judgment = "判定対象なし"
+        elif sq_call_weighted_share >= 60:
+            sq_weighted_judgment = "Call側優勢"
+        elif sq_put_weighted_share >= 60:
+            sq_weighted_judgment = "Put側優勢"
+        else:
+            sq_weighted_judgment = "拮抗"
+
+        sq_wcol1, sq_wcol2, sq_wcol3 = st.columns(3)
+
+        with sq_wcol1:
+            st.metric(
+                "Call距離加重比率",
+                f"{sq_call_weighted_share:.1f}%"
+            )
+
+        with sq_wcol2:
+            st.metric(
+                "Put距離加重比率",
+                f"{sq_put_weighted_share:.1f}%"
+            )
+
+        with sq_wcol3:
+            st.metric(
+                "SQ調整後 距離加重判定",
+                sq_weighted_judgment
+            )
+
+        st.progress(int(sq_call_weighted_share))
+
+        st.caption(
+            "共通限月の建玉増加を現在値との距離で加重。"
+            "前日比は未計算です。既存スコアには反映しません。"
+        )
+
+        # ===== SQ調整後 距離加重スコアここまで =====
         
         st.subheader("📈 建玉増減ランキング")
 

@@ -634,7 +634,46 @@ if st.button(
         )
         # ===== SQ調整後ランキングここまで =====
 
-        
+        # ===== SQ調整後 建玉増減サマリー =====
+        st.markdown("### 🛡️ SQ調整後 建玉増減サマリー")
+
+        sq_summary_col1, sq_summary_col2, sq_summary_col3, sq_summary_col4 = st.columns(4)
+
+        sq_summary_items = [
+            ("Call 最大増加", 2, True, sq_summary_col1),
+            ("Put 最大増加", 1, True, sq_summary_col2),
+            ("Call 最大減少", 2, False, sq_summary_col3),
+            ("Put 最大減少", 1, False, sq_summary_col4),
+        ]
+
+        for label, pcdiv, is_increase, column in sq_summary_items:
+            subset = sq_strike_ranking[
+                (sq_strike_ranking["PCDiv"] == pcdiv)
+                & (
+                    (sq_strike_ranking["OI_change"] > 0)
+                    if is_increase
+                    else (sq_strike_ranking["OI_change"] < 0)
+                )
+            ]
+
+            if not subset.empty:
+                top = subset.sort_values(
+                    "OI_change",
+                    ascending=not is_increase
+                ).iloc[0]
+
+                with column:
+                    st.metric(
+                        label,
+                        f"{top['Strike']:,.0f}円",
+                        (
+                            f"{top['OI_change']:+,.0f}枚 ｜ "
+                            f"現在値から "
+                            f"{top['Strike'] - result['current_price']:+,.0f}円"
+                        ),
+                    )
+
+        # ===== SQ調整後 建玉増減サマリーここまで =====        
         
         st.subheader("📈 建玉増減ランキング")
 

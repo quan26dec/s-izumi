@@ -519,6 +519,122 @@ if st.button(
         )
         # ===== SQ調整後の建玉前日比ここまで =====
 
+
+        # ===== SQ調整後・権利行使価格別ランキング =====
+        st.subheader("🛡️ SQ調整後 建玉増減ランキング")
+
+        def make_sq_strike_summary(df):
+            temp = df.copy()
+
+            for col in ["PCDiv", "Strike", "OI"]:
+                temp[col] = pd.to_numeric(
+                    temp[col], errors="coerce"
+                )
+
+            temp = temp.dropna(
+                subset=["CM", "PCDiv", "Strike", "OI"]
+            )
+
+            return (
+                temp.groupby(
+                    ["CM", "PCDiv", "Strike"]
+                )["OI"].sum()
+            )
+
+        sq_today_strike = make_sq_strike_summary(option_df)
+        sq_previous_strike = make_sq_strike_summary(previous_df)
+
+        # 両日に存在する限月のみ比較
+        sq_common_cm = (
+            set(sq_today_strike.index.get_level_values("CM"))
+            & set(sq_previous_strike.index.get_level_values("CM"))
+        )
+
+        sq_today_strike = sq_today_strike[
+            sq_today_strike.index.get_level_values("CM").isin(
+                sq_common_cm
+            )
+        ]
+
+        sq_previous_strike = sq_previous_strike[
+            sq_previous_strike.index.get_level_values("CM").isin(
+                sq_common_cm
+            )
+        ]
+
+        # 同一限月・同一権利行使価格で比較
+        sq_strike_change = (
+            sq_today_strike
+            .subtract(sq_previous_strike, fill_value=0)
+            .rename("OI_change")
+            .reset_index()
+        )
+
+        # 限月をまたいで権利行使価格ごとに合算
+        sq_strike_ranking = (
+            sq_strike_change
+            .groupby(["PCDiv", "Strike"], as_index=False)[
+                "OI_change"
+            ]
+            .sum()
+        )
+
+        sq_strike_ranking["区分"] = (
+            sq_strike_ranking["PCDiv"]
+            .map({1: "Put", 2: "Call"})
+        )
+
+        sq_top_increase = (
+            sq_strike_ranking
+            .sort_values("OI_change", ascending=False)
+            .head(10)
+        )
+
+        sq_top_decrease = (
+            sq_strike_ranking
+            .sort_values("OI_change", ascending=True)
+            .head(10)
+        )
+
+        with st.expander(
+            "🛡️ SQ調整後ランキング TOP10",
+            expanded=False
+        ):
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.markdown("#### ▲ 建玉増加 TOP10")
+                st.dataframe(
+                    sq_top_increase[
+                        ["区分", "Strike", "OI_change"]
+                    ].rename(columns={
+                        "Strike": "権利行使価格",
+                        "OI_change": "建玉増減"
+                    }),
+                    hide_index=True,
+                    width="stretch"
+                )
+
+            with col2:
+                st.markdown("#### ▼ 建玉減少 TOP10")
+                st.dataframe(
+                    sq_top_decrease[
+                        ["区分", "Strike", "OI_change"]
+                    ].rename(columns={
+                        "Strike": "権利行使価格",
+                        "OI_change": "建玉増減"
+                    }),
+                    hide_index=True,
+                    width="stretch"
+                )
+
+        st.caption(
+            "共通限月のみを対象に、同一限月・同一権利行使価格の"
+            "建玉変化を集計しています。既存スコアには反映しません。"
+        )
+        # ===== SQ調整後ランキングここまで =====
+
+        
         
         st.subheader("📈 建玉増減ランキング")
 

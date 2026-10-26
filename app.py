@@ -638,6 +638,22 @@ if st.button(
             + ", ".join(sorted(sq_three_day_common_cm))
         )
         # ===== 3日間共通限月の確認ここまで =====
+
+        # ===== 3日間共通限月で当日建玉変化を統一 =====
+        sq_today_3day_change = sq_strike_change[
+            sq_strike_change["CM"].isin(sq_three_day_common_cm)
+        ].copy()
+
+        sq_previous_3day_change = sq_previous_change_df[
+            sq_previous_change_df["CM"].isin(sq_three_day_common_cm)
+        ].copy()
+
+        st.caption(
+            f"🛡️ 3日間統一データ："
+            f"当日 {len(sq_today_3day_change):,}件 ｜ "
+            f"前日 {len(sq_previous_3day_change):,}件"
+        )
+        # ===== 3日間共通限月で当日建玉変化を統一ここまで =====
         
         # 限月をまたいで権利行使価格ごとに合算
         sq_strike_ranking = (

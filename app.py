@@ -234,6 +234,20 @@ if st.button(
         previous_oi_df_for_compare = previous_df.copy()
         two_days_ago_oi_df = two_days_ago_df.copy()
 
+        # ===== 前日比較用 SQ共通限月チェック =====
+        previous_cm_set = set(previous_df["CM"].dropna())
+        two_days_ago_cm_set = set(two_days_ago_df["CM"].dropna())
+
+        previous_common_cm = (
+            previous_cm_set & two_days_ago_cm_set
+        )
+
+        st.caption(
+            "🛡️ 前日比較の共通限月："
+            + ", ".join(sorted(previous_common_cm))
+        )
+        # ===== 前日比較用 SQ共通限月チェックここまで =====
+        
         for column in ["Strike", "OI", "PCDiv"]:
             previous_oi_df_for_compare[column] = pd.to_numeric(
                 previous_oi_df_for_compare[column],

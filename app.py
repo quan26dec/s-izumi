@@ -628,6 +628,17 @@ if st.button(
             .reset_index()
         )
 
+        # ===== 3日間共通限月の確認 =====
+        sq_three_day_common_cm = (
+            sq_common_cm & previous_common_cm
+        )
+
+        st.caption(
+            "🛡️ 3日間共通限月："
+            + ", ".join(sorted(sq_three_day_common_cm))
+        )
+        # ===== 3日間共通限月の確認ここまで =====
+        
         # 限月をまたいで権利行使価格ごとに合算
         sq_strike_ranking = (
             sq_strike_change

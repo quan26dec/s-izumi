@@ -274,6 +274,34 @@ if st.button(
             f"前々日 {len(sq_two_days_ago_oi_df):,}件"
         )
         # ===== 前日比較用 SQ調整データここまで =====
+
+        # ===== 前日比較用 SQ建玉増減 =====
+        for df in [sq_previous_oi_df, sq_two_days_ago_oi_df]:
+            for col in ["PCDiv", "Strike", "OI"]:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+
+        sq_prev_group = (
+            sq_previous_oi_df
+            .groupby(["CM", "PCDiv", "Strike"])["OI"]
+            .sum()
+        )
+
+        sq_2days_group = (
+            sq_two_days_ago_oi_df
+            .groupby(["CM", "PCDiv", "Strike"])["OI"]
+            .sum()
+        )
+
+        sq_previous_change_df = (
+            sq_prev_group.subtract(sq_2days_group, fill_value=0)
+            .reset_index(name="OI_change")
+        )
+
+        st.caption(
+            f"🛡️ 前日SQ調整後の建玉増減："
+            f"{len(sq_previous_change_df):,}件"
+        )
+        # ===== 前日比較用 SQ建玉増減ここまで =====
         
         previous_oi_df_for_compare = (
             previous_oi_df_for_compare

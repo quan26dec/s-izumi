@@ -703,6 +703,75 @@ if st.button(
             )
 
         # ===== SQ調整後 Call比率の前日変化ここまで =====
+
+        # ===== SQ調整後 距離加重Call比率 =====
+        def calc_sq_weighted_call_share(df, current_price):
+            if current_price <= 0:
+                return None
+
+            temp = df.copy()
+            temp = temp[
+                (temp["OI_change"] > 0)
+                & (temp["Strike"] >= current_price * 0.90)
+                & (temp["Strike"] <= current_price * 1.10)
+            ].copy()
+
+            temp["距離ウェイト"] = (
+                1 / (
+                    1
+                    + (temp["Strike"] - current_price).abs()
+                    / current_price * 100
+                )
+            )
+
+            temp["加重建玉増加"] = (
+                temp["OI_change"] * temp["距離ウェイト"]
+            )
+
+            call_sum = temp.loc[
+                temp["PCDiv"] == 2, "加重建玉増加"
+            ].sum()
+
+            put_sum = temp.loc[
+                temp["PCDiv"] == 1, "加重建玉増加"
+            ].sum()
+
+            total = call_sum + put_sum
+
+            if total > 0:
+                return call_sum / total * 100
+
+            return None
+
+        sq_today_weighted_share = calc_sq_weighted_call_share(
+            sq_today_3day_change,
+            result["current_price"]
+        )
+
+        sq_previous_weighted_share = calc_sq_weighted_call_share(
+            sq_previous_3day_change,
+            previous_current_price
+        )
+
+        if (
+            sq_today_weighted_share is not None
+            and sq_previous_weighted_share is not None
+        ):
+            sq_weighted_share_change = (
+                sq_today_weighted_share - sq_previous_weighted_share
+            )
+
+            st.info(
+                f"🛡️ SQ調整後・距離加重Call比率："
+                f"前日 {sq_previous_weighted_share:.1f}% → "
+                f"当日 {sq_today_weighted_share:.1f}% ｜ "
+                f"変化 {sq_weighted_share_change:+.1f}pt"
+            )
+        else:
+            st.warning(
+                "SQ調整後・距離加重Call比率を計算できません"
+            )
+        # ===== SQ調整後 距離加重Call比率ここまで =====
         
         # 限月をまたいで権利行使価格ごとに合算
         sq_strike_ranking = (

@@ -654,6 +654,55 @@ if st.button(
             f"前日 {len(sq_previous_3day_change):,}件"
         )
         # ===== 3日間共通限月で当日建玉変化を統一ここまで =====
+
+        # ===== SQ調整後 Call比率の前日変化 =====
+        def calc_sq_call_share(df):
+            positive_df = df[df["OI_change"] > 0]
+
+            call_sum = positive_df.loc[
+                positive_df["PCDiv"] == 2, "OI_change"
+            ].sum()
+
+            put_sum = positive_df.loc[
+                positive_df["PCDiv"] == 1, "OI_change"
+            ].sum()
+
+            total = call_sum + put_sum
+
+            if total > 0:
+                return call_sum / total * 100
+
+            return None
+
+        sq_today_call_share = calc_sq_call_share(
+            sq_today_3day_change
+        )
+
+        sq_previous_call_share = calc_sq_call_share(
+            sq_previous_3day_change
+        )
+
+        if (
+            sq_today_call_share is not None
+            and sq_previous_call_share is not None
+        ):
+            sq_call_share_change = (
+                sq_today_call_share - sq_previous_call_share
+            )
+
+            st.info(
+                f"🛡️ SQ調整後 Call比率："
+                f"前日 {sq_previous_call_share:.1f}% → "
+                f"当日 {sq_today_call_share:.1f}% ｜ "
+                f"変化 {sq_call_share_change:+.1f}pt"
+            )
+        else:
+            st.info(
+                "🛡️ SQ調整後 Call比率："
+                "比較に必要な建玉増加データがありません"
+            )
+
+        # ===== SQ調整後 Call比率の前日変化ここまで =====
         
         # 限月をまたいで権利行使価格ごとに合算
         sq_strike_ranking = (

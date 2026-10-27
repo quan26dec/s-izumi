@@ -773,6 +773,87 @@ if st.button(
             )
         # ===== SQ調整後 距離加重Call比率ここまで =====
 
+        # ===== SQ調整後 距離加重の効果比較 =====
+        def calc_sq_near_call_share(df, current_price):
+            if current_price <= 0:
+                return None
+
+            temp = df[
+                (df["OI_change"] > 0)
+                & (df["Strike"] >= current_price * 0.90)
+                & (df["Strike"] <= current_price * 1.10)
+            ]
+
+            call_sum = temp.loc[
+                temp["PCDiv"] == 2, "OI_change"
+            ].sum()
+
+            put_sum = temp.loc[
+                temp["PCDiv"] == 1, "OI_change"
+            ].sum()
+
+            total = call_sum + put_sum
+
+            if total > 0:
+                return call_sum / total * 100
+
+            return None
+
+        sq_today_near_share = calc_sq_near_call_share(
+            sq_today_3day_change,
+            result["current_price"]
+        )
+
+        sq_previous_near_share = calc_sq_near_call_share(
+            sq_previous_3day_change,
+            previous_current_price
+        )
+
+        if (
+            sq_today_near_share is not None
+            and sq_previous_near_share is not None
+            and sq_today_weighted_share is not None
+            and sq_previous_weighted_share is not None
+        ):
+            sq_near_change = (
+                sq_today_near_share - sq_previous_near_share
+            )
+
+            st.subheader("🔬 SQ調整後 距離加重の効果比較")
+
+            comparison_df = pd.DataFrame({
+                "方式": ["距離加重なし", "距離加重あり"],
+                "前日Call比率": [
+                    sq_previous_near_share,
+                    sq_previous_weighted_share
+                ],
+                "当日Call比率": [
+                    sq_today_near_share,
+                    sq_today_weighted_share
+                ],
+                "変化幅": [
+                    sq_near_change,
+                    sq_weighted_share_change
+                ]
+            })
+
+            st.dataframe(
+                comparison_df.style.format({
+                    "前日Call比率": "{:.1f}%",
+                    "当日Call比率": "{:.1f}%",
+                    "変化幅": "{:+.1f}pt"
+                }),
+                width="stretch",
+                hide_index=True
+            )
+
+            st.caption(
+                "両方式とも3日間共通限月・建玉増加分・"
+                "各日の現在値±10%を対象に比較。"
+                "違いは距離ウェイトの有無のみです。"
+            )
+        # ===== SQ調整後 距離加重の効果比較ここまで =====
+        
         # ===== SQ調整後 総合スコア試算 =====
         if (
             sq_today_weighted_share is not None

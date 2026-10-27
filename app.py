@@ -918,6 +918,40 @@ if st.button(
                 "変化補正のみSQ調整後・距離加重Call比率で試算。"
                 "既存スコア・保存データには反映していません。"
             )
+
+            # ===== 既存スコアとSQ調整後の比較 =====
+            st.markdown("### 🔬 既存スコア vs SQ調整後")
+
+            score_comparison_df = pd.DataFrame({
+                "項目": [
+                    "既存の状態スコア",
+                    "SQ調整後の試算スコア"
+                ],
+                "スコア": [
+                    result["total_score"],
+                    sq_trial_score
+                ],
+                "判定": [
+                    result["market_judgment"],
+                    sq_trial_judgment
+                ]
+            })
+
+            st.dataframe(
+                score_comparison_df.style.format({
+                    "スコア": "{:.1f}点"
+                }),
+                width="stretch",
+                hide_index=True
+            )
+
+            st.caption(
+                "SQ調整後は既存の状態スコアに、"
+                "SQ調整後・距離加重Call比率の変化補正を加えた試算です。"
+                "Google Sheetsには保存していません。"
+            )
+            # ===== 既存スコアとSQ調整後の比較ここまで =====
+        
         # ===== SQ調整後 総合スコア試算ここまで =====
         
         # 限月をまたいで権利行使価格ごとに合算

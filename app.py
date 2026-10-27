@@ -772,6 +772,72 @@ if st.button(
                 "SQ調整後・距離加重Call比率を計算できません"
             )
         # ===== SQ調整後 距離加重Call比率ここまで =====
+
+        # ===== SQ調整後 総合スコア試算 =====
+        if (
+            sq_today_weighted_share is not None
+            and sq_previous_weighted_share is not None
+        ):
+            sq_flow_adjustment = max(
+                -10.0,
+                min(
+                    10.0,
+                    sq_weighted_share_change * 0.5
+                )
+            )
+
+            sq_trial_score = max(
+                0.0,
+                min(
+                    100.0,
+                    result["total_score"] + sq_flow_adjustment
+                )
+            )
+
+            if sq_trial_score >= 70:
+                sq_trial_judgment = "強気"
+            elif sq_trial_score >= 60:
+                sq_trial_judgment = "やや強気"
+            elif sq_trial_score >= 40:
+                sq_trial_judgment = "中立"
+            elif sq_trial_score >= 30:
+                sq_trial_judgment = "やや弱気"
+            else:
+                sq_trial_judgment = "弱気"
+
+            st.subheader("🛡️ SQ調整後 総合スコア試算")
+
+            col1, col2, col3 = st.columns(3)
+
+            with col1:
+                st.metric(
+                    "状態スコア",
+                    f'{result["total_score"]:.1f}点'
+                )
+
+            with col2:
+                st.metric(
+                    "SQ調整後 変化補正",
+                    f"{sq_flow_adjustment:+.1f}点"
+                )
+
+            with col3:
+                st.metric(
+                    "SQ調整後 試算スコア",
+                    f"{sq_trial_score:.1f}点"
+                )
+
+            st.info(
+                f"🛡️ SQ調整後の試算判定："
+                f"{sq_trial_judgment}"
+            )
+
+            st.caption(
+                "状態スコアは既存値を使用し、"
+                "変化補正のみSQ調整後・距離加重Call比率で試算。"
+                "既存スコア・保存データには反映していません。"
+            )
+        # ===== SQ調整後 総合スコア試算ここまで =====
         
         # 限月をまたいで権利行使価格ごとに合算
         sq_strike_ranking = (
